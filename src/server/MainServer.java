@@ -32,9 +32,15 @@ public class MainServer {
             }
         }
 
+        String[] loginData = FileManager.getLoginData();
+        if (loginData == null) {
+            return;
+        }
+
         DatabaseManager databaseManager;
         try {
-            databaseManager = new DatabaseManager();
+            databaseManager = new DatabaseManager(Config.jdbcLocal, loginData[0], loginData[1]);
+            databaseManager.connectToDatabase();
         } catch (Exception exception) {
             exception.printStackTrace();
             return;

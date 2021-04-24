@@ -1,5 +1,6 @@
 package server.util;
 
+import common.Config;
 import common.exceptions.NoAccessToFileException;
 import common.model.StudyGroup;
 import common.xml.StudyGroups;
@@ -10,6 +11,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.TreeSet;
 
 public class FileManager {
@@ -73,6 +75,16 @@ public class FileManager {
         } else System.out.println("Системная переменная с загрузочным файлом не найдена!");
         System.out.println("Проверьте переменную окружения " + envVariable + " и запустите заново.");
         return new TreeSet<>();
+    }
+
+    public static String[] getLoginData() {
+        try {
+            Scanner scanner = new Scanner(new FileReader(Config.TOP_SECRET_FILE));
+            return new String[] {scanner.nextLine(), scanner.nextLine()};
+        } catch (FileNotFoundException e) {
+            System.out.println("Не найден файл с данными для доступа к базе данных.");
+        }
+        return null;
     }
 
     private InputStreamReader getInputStreamReader() throws FileNotFoundException, NoAccessToFileException {
