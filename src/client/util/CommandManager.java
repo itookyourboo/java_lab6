@@ -2,6 +2,7 @@ package client.util;
 
 import client.RequestSender;
 import client.commands.*;
+import common.net.Request;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,24 +14,27 @@ public class CommandManager {
      */
     protected HashMap<String, Command> commands = new HashMap<String, Command>();
     private Scanner scanner;
+    private RequestSender requestSender;
 
-    public CommandManager(RequestSender con, Scanner scanner){
-        registerCommand(new AddCommand(con, scanner));
-        registerCommand(new AddIfMinCommand(con, scanner));
+    public CommandManager(RequestSender requestSender, Scanner scanner){
+        registerCommand(new AddCommand(requestSender, scanner));
+        registerCommand(new AddIfMinCommand(requestSender, scanner));
         registerCommand(new ClearCommand());
-        registerCommand(new CountByGroupAdminCommand(con, scanner));
-        registerCommand(new ExecuteScriptCommand(this, con));
+        registerCommand(new CountByGroupAdminCommand(requestSender, scanner));
+        registerCommand(new ExecuteScriptCommand(this, requestSender));
         registerCommand(new ExitCommand());
-        registerCommand(new FilterGreaterThanExpelledStudentsCommand(con));
+        registerCommand(new FilterGreaterThanExpelledStudentsCommand(requestSender));
         registerCommand(new HelpCommand(this));
-        registerCommand(new InfoCommand(con));
-        registerCommand(new RemoveByIdCommand(con));
-        registerCommand(new RemoveGreaterCommand(con, scanner));
-        registerCommand(new RemoveLowerCommand(con, scanner));
-        registerCommand(new SaveCommand(con));
-        registerCommand(new ShowCommand(con));
-        registerCommand(new UpdateCommand(con, scanner));
+        registerCommand(new InfoCommand(requestSender));
+        registerCommand(new LoginCommand(requestSender, scanner));
+        registerCommand(new RegisterCommand(requestSender, scanner));
+        registerCommand(new RemoveByIdCommand(requestSender));
+        registerCommand(new RemoveGreaterCommand(requestSender, scanner));
+        registerCommand(new RemoveLowerCommand(requestSender, scanner));
+        registerCommand(new ShowCommand(requestSender));
+        registerCommand(new UpdateCommand(requestSender, scanner));
 
+        this.requestSender = requestSender;
         this.scanner = scanner;
     }
 
@@ -39,14 +43,18 @@ public class CommandManager {
         if (args.length == 0)
             Interactor.println("Введённая строка пуста.");
 
-        String command = args[0];
-        if (!commands.containsKey(command))
-            throw new IndexOutOfBoundsException(String.format("Команды \"%s\" нет.", command));
+        String commandString = args[0];
+        if (!commands.containsKey(commandString))
+            throw new IndexOutOfBoundsException(String.format("Команды \"%s\" нет.", commandString));
 
         try{
-            commands.get(command).execute(input.replace(command, "").trim());
+            Command command = commands.get(commandString);
+            if (requestSender.getUser() != null || command.canExecuteIfNotAuthed())
+                commands.get(commandString).execute(input.replace(commandString, "").trim());
+            else
+                Interactor.printError("Команда доступна только авторизованным пользователям.");
         } catch (Exception e){
-            Interactor.printError("Произошла ошибка: " + e.getMessage());
+            Interactor.printError(e.getMessage());
         }
     }
 

@@ -1,6 +1,7 @@
 package client;
 
 import common.Config;
+import common.model.User;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
@@ -11,6 +12,7 @@ import java.net.Socket;
 public class RequestSender {
     protected final int MAX_ATTEMPTS_COUNT = 5;
     private int port = Config.PORT;
+    private User user;
 
     public RequestSender() {}
 
@@ -23,6 +25,7 @@ public class RequestSender {
             throw new IllegalArgumentException("Запрос не может быть null!");
         }
 
+        request.user = user;
         int attempts = 0; // Сколько было попыток отправить запрос
         while (attempts < MAX_ATTEMPTS_COUNT){
             try{
@@ -51,5 +54,13 @@ public class RequestSender {
             }
         }
         return new CommandResult(ResultStatus.ERROR, "Не удалось подключиться к серверу, больше пытаться нет смысла.");
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

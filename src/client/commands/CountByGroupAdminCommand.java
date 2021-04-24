@@ -16,11 +16,9 @@ import java.util.Scanner;
  * 'count_by_group_admin_command' command. Prints amount of groups with the same admin
  */
 public class CountByGroupAdminCommand extends Command{
-    private Scanner scanner;
 
     public CountByGroupAdminCommand(RequestSender requestSender, Scanner scanner) {
-        super(requestSender);
-        this.scanner = scanner;
+        super(requestSender, scanner);
     }
 
     /**

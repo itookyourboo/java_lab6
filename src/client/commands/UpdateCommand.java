@@ -16,11 +16,9 @@ import common.net.ResultStatus;
  * 'update' command. Updates the information about selected studyGroup.
  */
 public class UpdateCommand extends Command {
-    private Scanner scanner;
 
     public UpdateCommand(RequestSender requestSender, Scanner scanner) {
-        super(requestSender);
-        this.scanner = scanner;
+        super(requestSender, scanner);
     }
 
     /**

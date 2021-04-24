@@ -263,7 +263,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public void save() throws IOException {
+    public void save() {
         saveCollection();
     }
 

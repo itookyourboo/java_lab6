@@ -8,6 +8,7 @@ import common.model.FormOfEducation;
 import common.model.Location;
 import common.model.Person;
 
+import java.io.Console;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -21,9 +22,38 @@ public class Interactor {
     private static final int MIN_EXPELLED_STUDENTS = 0;
     private static final int MIN_SHOULD_BE_EXPELLED = 0;
     private static Pattern patternNumber = Pattern.compile("-?\\d+(\\.\\d+)?");
+    private static Pattern patternUsername = Pattern.compile("[_0-9A-Za-z]{3,12}");
+    private static Pattern patternPassword = Pattern.compile("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[_0-9a-zA-Z!@#$%^&*]{6,30}");
 
     static boolean fileMode = false;
-    
+
+    public static String askUsername(Scanner scanner) {
+        String username;
+        while (true) {
+            System.out.println("Введите имя пользователя:");
+            username = scanner.nextLine();
+            if (patternUsername.matcher(username).matches())
+                return username;
+            printError("Имя пользователя - от 3 до 12 символов (_0-9a-Z).");
+        }
+    }
+
+    public static String askPassword(Scanner scanner) {
+        String password;
+        Console console = System.console();
+        while (true) {
+            System.out.println("Введите пароль:");
+            if (console != null) {
+                char[] symbols = console.readPassword();
+                if (symbols == null) continue;
+                password = String.valueOf(symbols);
+            } else password = scanner.nextLine();
+            if (patternPassword.matcher(password).matches())
+                return password;
+            printError("Пароль - от 6 до 30 символов (хотя бы 1 цифра, 1 заглавная и 1 строчная латинская буква, _0-9a-Z!@#$%^&*).");
+        }
+    }
+
     /**
      * Asks a user the studyGroup's name.
      *

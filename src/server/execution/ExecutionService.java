@@ -1,18 +1,28 @@
 package server.execution;
 
 import common.DataManager;
+import common.model.StudyGroup;
+import common.model.User;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
+import server.util.DatabaseManager;
 
 import java.util.HashMap;
 
 public class ExecutionService {
     private HashMap<String, Executable> commands = new HashMap<>();
     private DataManager dataManager;
+    private DatabaseManager databaseManager;
 
     public ExecutionService(DataManager dataManager) {
         this.dataManager = dataManager;
+        initCommands();
+    }
+
+    public ExecutionService(DataManager dataManager, DatabaseManager databaseManager) {
+        this.dataManager = dataManager;
+        this.databaseManager = databaseManager;
         initCommands();
     }
 
@@ -29,6 +39,10 @@ public class ExecutionService {
         commands.put("remove_lower", dataManager::removeLower);
         commands.put("update", dataManager::update);
         commands.put("show", dataManager::show);
+        if (databaseManager != null) {
+            commands.put("login", databaseManager::login);
+            commands.put("register", databaseManager::register);
+        }
     }
 
     public CommandResult executeCommand(Request<?> request) {

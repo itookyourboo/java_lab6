@@ -7,6 +7,7 @@ import common.net.Request;
 import common.net.ResultStatus;
 import server.execution.ExecutionService;
 import server.util.CollectionManager;
+import server.util.DatabaseManager;
 import server.util.FileManager;
 
 import java.io.IOException;
@@ -29,6 +30,14 @@ public class MainServer {
             } catch (Exception exception) {
                 System.out.println("Не получается спарсить порт. Используется " + port);
             }
+        }
+
+        DatabaseManager databaseManager;
+        try {
+            databaseManager = new DatabaseManager();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return;
         }
 
         DataManager dataManager;
@@ -56,7 +65,7 @@ public class MainServer {
             save(dataManager);
         }));
 
-        ExecutionService executionService = new ExecutionService(dataManager);
+        ExecutionService executionService = new ExecutionService(dataManager, databaseManager);
 
         AtomicBoolean exit = new AtomicBoolean(false);
         getUserInputHandler(dataManager, exit).start();

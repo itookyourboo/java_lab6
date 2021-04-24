@@ -16,12 +16,8 @@ import common.net.ResultStatus;
  * 'remove_greater' command. Removes elements greater than user entered.
  */
 public class RemoveLowerCommand extends Command {
-
-    private Scanner scanner;
-
     public RemoveLowerCommand(RequestSender requestSender, Scanner scanner) {
-        super(requestSender);
-        this.scanner = scanner;
+        super(requestSender, scanner);
     }
 
     /**

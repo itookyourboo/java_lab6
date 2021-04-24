@@ -16,11 +16,9 @@ import java.util.Scanner;
  * 'add' command. Adds a new element to the collection.
  */
 public class AddCommand extends Command {
-    Scanner scanner;
 
     public AddCommand(RequestSender requestSender, Scanner scanner) {
-        super(requestSender);
-        this.scanner = scanner;
+        super(requestSender, scanner);
     }
 
     @Override
