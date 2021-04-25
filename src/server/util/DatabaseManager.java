@@ -14,14 +14,12 @@ import java.util.*;
 
 public class DatabaseManager {
 
-    ArrayList<User> users = new ArrayList<>();
-
-    private static final String TABLE_USER = "user";
+    private static final String TABLE_USER = "\"user\"";
     private static final String TABLE_STUDY_GROUP = "study_group";
 
     private static final String USER_ID = "id";
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
+    private static final String USERNAME = "\"username\"";
+    private static final String PASSWORD = "\"password\"";
 
     private static final String STUDY_GROUP_ID = "id";
     private static final String NAME = "name";
@@ -43,17 +41,19 @@ public class DatabaseManager {
 
     private static final String SQL_ADD_USER = String.format("INSERT INTO %s (%s, %s) VALUES (?, ?)",
             TABLE_USER, USERNAME, PASSWORD);
-    private static final String SQL_FIND_USERNAME = String.format("SELECT COUNT(*) AS count FROM %s WHERE %s = ?",
+
+    private static final String SQL_FIND_USERNAME = String.format("SELECT COUNT(*) FROM %s WHERE %s = ?",
             TABLE_USER, USERNAME);
-    private static final String SQL_VALIDATE_USER = String.format("SELECT COUNT(*) AS count FROM %s WHERE %s = ? AND %s = ?",
+    private static final String SQL_VALIDATE_USER = String.format("SELECT COUNT(*) FROM %s WHERE %s = ? AND %s = ?",
             TABLE_USER, USERNAME, PASSWORD);
 
     private static final String SQL_ADD_STUDY_GROUP = String.format("INSERT INTO %s (" +
             "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING %s",
             TABLE_STUDY_GROUP,
             NAME, COORDINATE_X, COORDINATE_Y, CREATION_DATE, STUDENTS_COUNT, EXPELLED_STUDENTS, SHOULD_BE_EXPELLED, FORM_OF_EDUCATION,
-            ADMIN_NAME, ADMIN_WEIGHT, ADMIN_PASSPORT, ADMIN_LOCATION_X, ADMIN_LOCATION_Y, ADMIN_LOCATION_NAME, OWNER_USERNAME);
+            ADMIN_NAME, ADMIN_WEIGHT, ADMIN_PASSPORT, ADMIN_LOCATION_X, ADMIN_LOCATION_Y, ADMIN_LOCATION_NAME, OWNER_USERNAME,
+            STUDY_GROUP_ID);
     private static final String SQL_GET_MIN_STUDY_GROUP_NAME = String.format("SELECT %s FROM %s ORDER BY %s LIMIT 1",
             NAME, TABLE_STUDY_GROUP, NAME);
 //    private static final String SQL_COUNT_BY_GROUP_ADMIN = String.format("SELECT COUNT(*) as count FROM %s WHERE %s = ?",
@@ -83,9 +83,9 @@ public class DatabaseManager {
     private static final String SQL_BELONGS_TO_USER = String.format("SELECT %s FROM %s WHERE %s = ?",
             OWNER_USERNAME, TABLE_STUDY_GROUP, STUDY_GROUP_ID);
 
-    private String url;
-    private String username;
-    private String password;
+    private final String url;
+    private final String username;
+    private final String password;
     private Connection connection;
 
     public DatabaseManager(String url, String username, String password) {
@@ -112,6 +112,9 @@ public class DatabaseManager {
                 return new CommandResult(ResultStatus.OK,
                         String.format("Добро пожаловать, %s!", user.getUsername()));
             return new CommandResult(ResultStatus.ERROR, "Неверный логин или пароль.");
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
@@ -120,13 +123,15 @@ public class DatabaseManager {
     public CommandResult register(Request<?> request) {
         try {
             User user = (User) request.entity;
-            if (userExists(user.getUsername())) {
+            if (!userExists(user.getUsername())) {
                 registerUser(user);
-                users.add(user);
                 return new CommandResult(ResultStatus.OK,
                         String.format("Добро пожаловать, %s!", user.getUsername()));
             }
             return new CommandResult(ResultStatus.ERROR, "Пользователь с таким именем уже зарегистрирован.");
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
@@ -148,27 +153,16 @@ public class DatabaseManager {
         return null;
     }
 
-    public int getLastId() throws SQLException {
-        try {
-            PreparedStatement statement = connection.prepareStatement(SQL_GET_LAST_ID);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.getInt("id");
-        } catch (SQLException e) {
-            System.out.println("Ошибка генерации id");
-            return 0;
-        }
-    }
-
     public void registerUser(User user) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(SQL_ADD_USER);
         statement.setString(1, user.getUsername());
         statement.setString(2, user.getHashedPassword());
         statement.executeUpdate();
         statement.close();
-        users.add(user);
     }
 
     public boolean userExists(String username) throws SQLException {
+        System.out.println(SQL_FIND_USERNAME);
         PreparedStatement statement = connection.prepareStatement(SQL_FIND_USERNAME);
         statement.setString(1, username);
         ResultSet resultSet = statement.executeQuery();
@@ -264,15 +258,20 @@ public class DatabaseManager {
 
     public boolean addStudyGroup(StudyGroup studyGroup, String owner) {
         try {
-            connection.setSavepoint();
-
-            PreparedStatement statement = connection.prepareStatement(SQL_ADD_STUDY_GROUP);
+            PreparedStatement statement = connection.prepareStatement(SQL_ADD_STUDY_GROUP,
+                    Statement.RETURN_GENERATED_KEYS);
             int i = prepareStatement(statement, studyGroup, true);
             statement.setString(i, owner);
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0)
+                throw new SQLException("No rows affected");
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next())
+                    studyGroup.setId(generatedKeys.getInt(STUDY_GROUP_ID));
+                else
+                    throw new SQLException("No ID obtained");
+            }
             statement.close();
-
-            connection.commit();
             return true;
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -287,15 +286,11 @@ public class DatabaseManager {
         if (!belongsToUser(id, username)) throw new AccessDeniedException();
 
         try {
-            connection.setSavepoint();
-
             PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_BY_ID);
             int i = prepareStatement(statement, studyGroup, false);
             statement.setInt(i, id);
             statement.executeUpdate();
             statement.close();
-
-            connection.commit();
             return true;
         } catch (SQLException exception) {
             exception.printStackTrace();

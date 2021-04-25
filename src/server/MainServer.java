@@ -39,8 +39,6 @@ public class MainServer {
 
         DatabaseManager databaseManager;
         try {
-            System.out.println(Config.jdbcLocal);
-            System.out.println(Config.getJdbcUrl());
             databaseManager = new DatabaseManager(Config.jdbcLocal, loginData[0], loginData[1]);
             databaseManager.connectToDatabase();
         } catch (Exception exception) {
@@ -50,7 +48,8 @@ public class MainServer {
 
         DataManager dataManager;
         try {
-            dataManager = new CollectionManager(new FileManager(Config.ENV_VAR));
+            dataManager = new CollectionManager(databaseManager);
+            //dataManager = new CollectionManager(new FileManager(Config.ENV_VAR));
         } catch (Exception exception) {
             exception.printStackTrace();
             return;

@@ -167,8 +167,6 @@ public class CollectionManager extends DataManager {
     private CommandResult addStudyGroup(StudyGroup studyGroup, Request<?> request) throws SQLException {
         boolean ok = databaseManager.addStudyGroup(studyGroup, request.user.getUsername());
         if (ok) {
-            int id = databaseManager.getLastId();
-            studyGroup.setId(id);
             studyGroupCollection.add(studyGroup);
             return new CommandResult(ResultStatus.OK, "Новый элемент успешно добавлен");
         }
@@ -311,6 +309,8 @@ public class CollectionManager extends DataManager {
             }
 
             return new CommandResult(ResultStatus.ERROR, "Не удалось обновить группу");
+        } catch (AccessDeniedException exception) {
+            return new CommandResult(ResultStatus.ERROR, "Недостаточно прав для обновления.");
         } catch (NoStudyGroupWithSuchId exception) {
             return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
         } catch (SQLException exception) {

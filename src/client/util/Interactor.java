@@ -467,7 +467,6 @@ public class Interactor {
     public static void printError(String error) {
         System.out.println("ОШИБКА! " + error);
     }
-
     public static void displayInput() {
         System.out.print("> ");
     }

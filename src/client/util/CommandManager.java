@@ -81,6 +81,7 @@ public class CommandManager {
 
     public void runScript(CommandManager cm) {
         String input;
+        Interactor.fileMode = true;
         do {
             if (!cm.scanner.hasNextLine()) return;
             input = cm.scanner.nextLine();
@@ -91,5 +92,6 @@ public class CommandManager {
             }
             Interactor.println("");
         } while (!input.equals("exit"));
+        Interactor.fileMode = false;
     }
 }
