@@ -1,15 +1,18 @@
 package server.util;
 
 import common.DataManager;
+import common.exceptions.AccessDeniedException;
+import common.exceptions.NoStudyGroupWithSuchId;
 import common.model.Person;
 import common.model.StudyGroup;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
 
-import java.io.IOException;
+import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -18,7 +21,8 @@ public class CollectionManager extends DataManager {
     private TreeSet<StudyGroup> studyGroupCollection =  new TreeSet<>();
     private ZonedDateTime lastInitTime;
     private ZonedDateTime lastSaveTime;
-    private final FileManager fileManager;
+    private FileManager fileManager;
+    private DatabaseManager databaseManager;
 
     private final Comparator<StudyGroup> sortByName = Comparator.comparing(StudyGroup::getName);
 
@@ -28,6 +32,14 @@ public class CollectionManager extends DataManager {
         this.fileManager = fileManager;
 
         loadCollection();
+    }
+
+    public CollectionManager(DatabaseManager databaseManager) {
+        this.lastInitTime = null;
+        this.lastSaveTime = null;
+        this.databaseManager = databaseManager;
+
+        loadCollectionFromDB();
     }
 
     public void saveCollection() {
@@ -40,6 +52,11 @@ public class CollectionManager extends DataManager {
      */
     private void loadCollection() {
         studyGroupCollection = fileManager.readCollection();
+        lastInitTime = ZonedDateTime.now();
+    }
+
+    private void loadCollectionFromDB() {
+        studyGroupCollection = databaseManager.readCollection();
         lastInitTime = ZonedDateTime.now();
     }
 
@@ -123,9 +140,9 @@ public class CollectionManager extends DataManager {
     public CommandResult add(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
-            studyGroup.setId(generateNextId());
-            studyGroupCollection.add(studyGroup);
-            return new CommandResult(ResultStatus.OK, "Новый элемент успешно добавлен");
+            return addStudyGroup(studyGroup, request);
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
@@ -135,15 +152,27 @@ public class CollectionManager extends DataManager {
     public CommandResult addIfMin(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
-            studyGroup.setId(generateNextId());
-            if (studyGroup.compareTo(getFirst()) < 0) {
-                studyGroupCollection.add(studyGroup);
-                return new CommandResult(ResultStatus.OK, "Новый элемент успешно добавлен");
-            }
-            return new CommandResult(ResultStatus.OK, "Элемент не минимальный");
+            String minStudyGroupName = databaseManager.getMinStudyGroupName();
+            if (studyGroup.getName().compareTo(minStudyGroupName) < 0)
+                return addStudyGroup(studyGroup, request);
+
+            return new CommandResult(ResultStatus.OK, "Элемент не был добавлен, так как не минимальный.");
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
+    }
+
+    private CommandResult addStudyGroup(StudyGroup studyGroup, Request<?> request) throws SQLException {
+        boolean ok = databaseManager.addStudyGroup(studyGroup, request.user.getUsername());
+        if (ok) {
+            int id = databaseManager.getLastId();
+            studyGroup.setId(id);
+            studyGroupCollection.add(studyGroup);
+            return new CommandResult(ResultStatus.OK, "Новый элемент успешно добавлен");
+        }
+        return new CommandResult(ResultStatus.ERROR, "Не удалось добавить элемент");
     }
 
     @Override
@@ -199,25 +228,37 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult removeAllByShouldBeExpelled(Request<?> request) {
+    public CommandResult removeById(Request<?> request) {
         try {
-            Integer shouldBeExpelled = (Integer) request.entity;
-            int last = studyGroupCollection.size();
-            studyGroupCollection.removeIf(studyGroup -> studyGroup.getShouldBeExpelled().equals(shouldBeExpelled));
-            return new CommandResult(ResultStatus.ERROR, "Удалено " + (last - studyGroupCollection.size()) + " групп");
+            Integer id = (Integer) request.entity;
+            if (studyGroupCollection.stream().filter(studyGroup -> studyGroup.getId().equals(id)).findFirst().orElse(null) == null)
+                return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
+
+            boolean ok = databaseManager.removeById(id, request.user.getUsername());
+            if (ok) {
+                studyGroupCollection.removeIf(studyGroup -> studyGroup.getId().equals(id));
+                return new CommandResult(ResultStatus.OK, "Группа успешно удалена");
+            }
+
+            return new CommandResult(ResultStatus.ERROR, "Не удалось удалить группу.");
+        } catch (NoStudyGroupWithSuchId exception) {
+            return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
+        } catch (AccessDeniedException exception) {
+            return new CommandResult(ResultStatus.ERROR, "Недостаточно прав для удаления.");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
     }
 
     @Override
-    public CommandResult removeById(Request<?> request) {
+    public CommandResult removeAllByShouldBeExpelled(Request<?> request) {
         try {
-            Integer id = (Integer) request.entity;
-            if (studyGroupCollection.stream().filter(studyGroup -> studyGroup.getId().equals(id)).findFirst().orElse(null) == null)
-                return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
-            studyGroupCollection.removeIf(studyGroup -> studyGroup.getId().equals(id));
-            return new CommandResult(ResultStatus.OK, "Группа успешно удалена");
+            Integer shouldBeExpelled = (Integer) request.entity;
+            return deleteElements(databaseManager.removeAllByShouldBeExpelled(shouldBeExpelled));
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
@@ -227,10 +268,10 @@ public class CollectionManager extends DataManager {
     public CommandResult removeGreater(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
-            int last = studyGroupCollection.size();
-            studyGroupCollection.removeIf(studyGroup1 -> studyGroup1.compareTo(studyGroup) > 0);
-            return new CommandResult(ResultStatus.OK, "Удалено групп: " + (last - studyGroupCollection.size()));
-        } catch (Exception exception) {
+            return deleteElements(databaseManager.removeGreater(studyGroup));
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
+        }catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
     }
@@ -239,24 +280,41 @@ public class CollectionManager extends DataManager {
     public CommandResult removeLower(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
-            int last = studyGroupCollection.size();
-            studyGroupCollection.removeIf(studyGroup1 -> studyGroup1.compareTo(studyGroup) < 0);
-            return new CommandResult(ResultStatus.OK, "Удалено групп: " + (last - studyGroupCollection.size()));
-        } catch (Exception exception) {
+            return deleteElements(databaseManager.removeLower(studyGroup));
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
+        }catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }
+    }
+
+    private CommandResult deleteElements(List<Integer> deletedIds) {
+        int last = studyGroupCollection.size();
+        if (deletedIds.size() > 0) {
+            deletedIds.forEach(id -> studyGroupCollection.removeIf(studyGroup -> studyGroup.getId().equals(id)));
+            return new CommandResult(ResultStatus.OK, "Удалено групп: " + (last - studyGroupCollection.size()));
+        }
+        return new CommandResult(ResultStatus.OK, "Элементы не были удалены в виду отсутствия прав или отсутсвия таких групп.");
     }
 
     @Override
     public CommandResult update(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
-            if (getById(studyGroup.getId()) == null)
-                return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
-            studyGroupCollection.stream()
-                    .filter(studyGroup1 -> studyGroup1.getId().equals(studyGroup.getId()))
-                    .forEach(studyGroup1 -> studyGroup1.update(studyGroup));
-            return new CommandResult(ResultStatus.OK, "Группа успешно обновлена");
+            int id = studyGroup.getId();
+            boolean ok = databaseManager.updateStudyGroup(id, studyGroup, request.user.getUsername());
+            if (ok) {
+                studyGroupCollection.stream()
+                        .filter(studyGroup1 -> studyGroup1.getId().equals(id))
+                        .forEach(studyGroup1 -> studyGroup1.update(studyGroup));
+                return new CommandResult(ResultStatus.OK, "Группа успешно обновлена");
+            }
+
+            return new CommandResult(ResultStatus.ERROR, "Не удалось обновить группу");
+        } catch (NoStudyGroupWithSuchId exception) {
+            return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
+        } catch (SQLException exception) {
+            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
         } catch (Exception exception) {
             return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
         }

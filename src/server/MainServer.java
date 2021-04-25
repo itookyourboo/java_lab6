@@ -39,6 +39,8 @@ public class MainServer {
 
         DatabaseManager databaseManager;
         try {
+            System.out.println(Config.jdbcLocal);
+            System.out.println(Config.getJdbcUrl());
             databaseManager = new DatabaseManager(Config.jdbcLocal, loginData[0], loginData[1]);
             databaseManager.connectToDatabase();
         } catch (Exception exception) {
@@ -62,6 +64,7 @@ public class MainServer {
             System.out.println("Сервер запущен. Порт: " + port);
         } catch (IOException exception) {
             System.out.println("Ошибка запуска сервера!");
+            exception.printStackTrace();
             System.out.println(exception.getMessage());
             return;
         }
