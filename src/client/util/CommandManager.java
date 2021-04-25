@@ -27,7 +27,7 @@ public class CommandManager {
         registerCommand(new RemoveByIdCommand(con));
         registerCommand(new RemoveGreaterCommand(con, scanner));
         registerCommand(new RemoveLowerCommand(con, scanner));
-        registerCommand(new SaveCommand(con));
+        //registerCommand(new SaveCommand(con));
         registerCommand(new ShowCommand(con));
         registerCommand(new UpdateCommand(con, scanner));
 
@@ -73,6 +73,7 @@ public class CommandManager {
 
     public void runScript(CommandManager cm) {
         String input;
+        Interactor.fileMode = true;
         do {
             if (!cm.scanner.hasNextLine()) return;
             input = cm.scanner.nextLine();
@@ -83,5 +84,6 @@ public class CommandManager {
             }
             Interactor.println("");
         } while (!input.equals("exit"));
+        Interactor.fileMode = false;
     }
 }
