@@ -94,7 +94,6 @@ public class MainServer {
             while (true){
                 if(scanner.hasNextLine()){
                     String serverCommand = scanner.nextLine();
-                    System.out.println("Введено: " + serverCommand);
 
                     switch (serverCommand){
                         case "save":

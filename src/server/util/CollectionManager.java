@@ -214,7 +214,7 @@ public class CollectionManager extends DataManager {
     public CommandResult removeById(Request<?> request) {
         try {
             Integer id = (Integer) request.entity;
-            if (studyGroupCollection.stream().filter(studyGroup -> studyGroup.getId().equals(id)).findFirst().orElse(null) == null)
+            if (studyGroupCollection.stream().noneMatch(studyGroup -> studyGroup.getId().equals(id)))
                 return new CommandResult(ResultStatus.ERROR, "Группы с таким ID не существует");
             studyGroupCollection.removeIf(studyGroup -> studyGroup.getId().equals(id));
             return new CommandResult(ResultStatus.OK, "Группа успешно удалена");

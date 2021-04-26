@@ -18,7 +18,7 @@ public class MainClient {
             }
         }
 
-        RequestSender requestSender = new RequestSender();
+        RequestSender requestSender = new RequestSender(port);
         Scanner scanner = new Scanner(System.in);
         CommandManager commandManager = new CommandManager(requestSender, scanner);
         System.out.println("Клиент запущен! Порт: " + port);

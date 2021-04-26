@@ -46,6 +46,7 @@ public class CommandManager {
         try{
             commands.get(command).execute(input.replace(command, "").trim());
         } catch (Exception e){
+            e.printStackTrace();
             Interactor.printError("Произошла ошибка: " + e.getMessage());
         }
     }
