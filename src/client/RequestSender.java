@@ -23,7 +23,7 @@ public class RequestSender {
             throw new IllegalArgumentException("Запрос не может быть null!");
         }
 
-        int attempts = 0; // Сколько было попыток отправить запрос
+        int attempts = 0;
         while (attempts < MAX_ATTEMPTS_COUNT){
             try{
                 Socket socket = new Socket(Config.IP, port);
@@ -36,13 +36,13 @@ public class RequestSender {
                 ObjectInputStream ois = new ObjectInputStream(is);
                 CommandResult result = (CommandResult) ois.readObject();
                 if(attempts != 0){
-                    System.out.println("Вау! Появилось подключение!");
+                    System.out.println("Подключение восстановлено.");
                 }
                 attempts = MAX_ATTEMPTS_COUNT;
                 return result;
             }
             catch (IOException | ClassNotFoundException exc){
-                System.out.println("Не удалось подключиться к серверу, но мы подождём, мало ли...");
+                System.out.println("Не удалось подключиться к серверу, подождем...");
                 attempts++;
                 try {
                     Thread.sleep(5 * 1000);
@@ -50,6 +50,6 @@ public class RequestSender {
                 catch (Exception e) { }
             }
         }
-        return new CommandResult(ResultStatus.ERROR, "Не удалось подключиться к серверу, больше пытаться нет смысла.");
+        return new CommandResult(ResultStatus.ERROR, "Прошло 25 секунд, сервер умер.");
     }
 }

@@ -11,8 +11,6 @@ import common.net.ResultStatus;
  * 'remove_by_id' command. Removes the element by its ID.
  */
 public class RemoveByIdCommand extends Command {
-    private RequestSender requestSender;
-
     public RemoveByIdCommand(RequestSender requestSender) {
         super(requestSender);
     }
