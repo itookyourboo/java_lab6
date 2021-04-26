@@ -1,5 +1,6 @@
 package server.util;
 
+import common.Config;
 import common.DataManager;
 import common.exceptions.AccessDeniedException;
 import common.exceptions.NoStudyGroupWithSuchId;
@@ -38,6 +39,7 @@ public class CollectionManager extends DataManager {
         this.lastInitTime = null;
         this.lastSaveTime = null;
         this.databaseManager = databaseManager;
+        this.fileManager = new FileManager(Config.ENV_VAR);
 
         loadCollectionFromDB();
     }
