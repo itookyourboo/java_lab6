@@ -2,26 +2,29 @@ package server;
 
 import common.Config;
 import common.DataManager;
-import common.net.CommandResult;
-import common.net.Request;
-import common.net.ResultStatus;
 import server.execution.ExecutionService;
+import server.handlers.ReadRequestRunnable;
+import server.handlers.RequestHandler;
+import server.handlers.ServerInputHandler;
 import server.util.CollectionManager;
 import server.util.DatabaseManager;
 import server.util.FileManager;
+import sun.nio.ch.SocketAdaptor;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainServer {
 
     private static int port = Config.PORT;
+    private static final ExecutorService readRequestThreadPool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) {
         if (args.length == 1) {
@@ -59,7 +62,6 @@ public class MainServer {
         try {
             serverSocketChannel = ServerSocketChannel.open();
             serverSocketChannel.bind(new InetSocketAddress(port));
-            serverSocketChannel.configureBlocking(false);
             System.out.println("Сервер запущен. Порт: " + port);
         } catch (IOException exception) {
             System.out.println("Ошибка запуска сервера!");
@@ -70,65 +72,23 @@ public class MainServer {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Выход");
-            save(dataManager);
+            dataManager.save();
         }));
 
         ExecutionService executionService = new ExecutionService(dataManager, databaseManager);
 
         AtomicBoolean exit = new AtomicBoolean(false);
-        getUserInputHandler(dataManager, exit).start();
+        new ServerInputHandler(dataManager, exit).start();
 
         while (!exit.get()) {
-            try (SocketChannel socketChannel = serverSocketChannel.accept()) {
+            try {
+                SocketChannel socketChannel = serverSocketChannel.accept();
                 if (socketChannel == null) continue;
-
-                ObjectInputStream objectInputStream = new ObjectInputStream(socketChannel.socket().getInputStream());
-                Request<?> request = (Request<?>) objectInputStream.readObject();
-                System.out.println(socketChannel.getRemoteAddress() + ": " + request.command);
-
-                CommandResult result = executionService.executeCommand(request);
-                if (result.status == ResultStatus.OK)
-                    System.out.println("Команда выполнена успешно");
-                else
-                    System.out.println("Команда выполнена неуспешно");
-
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(socketChannel.socket().getOutputStream());
-                objectOutputStream.writeObject(result);
-            } catch (IOException | ClassNotFoundException exception) {
+                RequestHandler requestHandler = new RequestHandler(executionService);
+                readRequestThreadPool.submit(new ReadRequestRunnable(socketChannel, requestHandler));
+            } catch (IOException exception) {
                 exception.printStackTrace();
             }
         }
-    }
-
-    private static void save(DataManager dataManager) {
-        dataManager.save();
-    }
-
-    private static Thread getUserInputHandler(DataManager dataManager, AtomicBoolean exit){
-        return new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-
-            while (true){
-                if(scanner.hasNextLine()){
-                    String serverCommand = scanner.nextLine();
-
-                    switch (serverCommand){
-                        case "save":
-                            save(dataManager);
-                            break;
-                        case "exit":
-                            exit.set(true);
-                            return;
-                        default:
-                            System.out.println("Такой команды нет.");
-                            break;
-                    }
-                }
-                else{
-                    exit.set(true);
-                    return;
-                }
-            }
-        });
     }
 }
