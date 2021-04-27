@@ -10,17 +10,17 @@ import server.util.DatabaseManager;
 
 import java.util.HashMap;
 
-public class ExecutionService {
+public class CommandExecutionService {
     private HashMap<String, Executable> commands = new HashMap<>();
     private DataManager dataManager;
     private DatabaseManager databaseManager;
 
-    public ExecutionService(DataManager dataManager) {
+    public CommandExecutionService(DataManager dataManager) {
         this.dataManager = dataManager;
         initCommands();
     }
 
-    public ExecutionService(DataManager dataManager, DatabaseManager databaseManager) {
+    public CommandExecutionService(DataManager dataManager, DatabaseManager databaseManager) {
         this.dataManager = dataManager;
         this.databaseManager = databaseManager;
         initCommands();

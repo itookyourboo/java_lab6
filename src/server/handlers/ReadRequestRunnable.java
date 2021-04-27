@@ -14,8 +14,7 @@ import java.util.concurrent.Executors;
 public class ReadRequestRunnable implements Runnable {
     private SocketChannel socketChannel;
     private RequestHandler requestHandler;
-    private ExecutorService handleRequestThread = Executors.newFixedThreadPool(10);
-    private ExecutorService sendResponseThread = Executors.newFixedThreadPool(5);
+    private final ExecutorService handleRequestThread = Executors.newFixedThreadPool(10);
 
     public ReadRequestRunnable(SocketChannel socketChannel, RequestHandler requestHandler) {
         this.socketChannel = socketChannel;
@@ -30,7 +29,7 @@ public class ReadRequestRunnable implements Runnable {
             request = (Request<?>) objectInputStream.readObject();
             System.out.println(socketChannel.getRemoteAddress() + ": " + request.command);
             CommandResult response = requestHandler.handleRequest(request, handleRequestThread);
-            sendResponseThread.submit(new SendResponseRunnable(socketChannel, response));
+            new Thread(new SendResponseRunnable(socketChannel, response)).start();
         } catch (IOException | ClassNotFoundException exception) {
             //System.out.println("Хост принудительно разорвал соединение");
         }

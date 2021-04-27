@@ -97,7 +97,7 @@ public class CollectionManager extends DataManager {
     /**
      * @return The first element of the collection or null if collection is empty.
      */
-    public StudyGroup getFirst() {
+    public synchronized StudyGroup getFirst() {
         return studyGroupCollection.stream()
                 .findFirst()
                 .orElse(null);
@@ -106,7 +106,7 @@ public class CollectionManager extends DataManager {
     /**
      * @return The last element of the collection or null if collection is empty.
      */
-    public StudyGroup getLast() {
+    public synchronized StudyGroup getLast() {
         if (studyGroupCollection.isEmpty()) return null;
         return studyGroupCollection.last();
     }
@@ -115,7 +115,7 @@ public class CollectionManager extends DataManager {
      * @param id ID of the studyGroup.
      * @return A studyGroup by his ID or null if studyGroup isn't found.
      */
-    public StudyGroup getById(Integer id) {
+    public synchronized StudyGroup getById(Integer id) {
         return studyGroupCollection.stream()
                 .filter(studyGroup -> studyGroup.getId().equals(id))
                 .findFirst()
@@ -126,7 +126,7 @@ public class CollectionManager extends DataManager {
      * @param studyGroupToFind A studyGroup who's value will be found.
      * @return A studyGroup by his value or null if studyGroup isn't found.
      */
-    public StudyGroup getByValue(StudyGroup studyGroupToFind) {
+    public synchronized StudyGroup getByValue(StudyGroup studyGroupToFind) {
         return studyGroupCollection.stream()
                 .filter(studyGroup -> studyGroup.similar(studyGroupToFind))
                 .findFirst()
@@ -134,12 +134,12 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    protected Integer generateNextId() {
+    protected synchronized Integer generateNextId() {
         return getLast().getId() + 1;
     }
 
     @Override
-    public CommandResult add(Request<?> request) {
+    public synchronized CommandResult add(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
             return addStudyGroup(studyGroup, request);
@@ -151,7 +151,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult addIfMin(Request<?> request) {
+    public synchronized CommandResult addIfMin(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
             String minStudyGroupName = databaseManager.getMinStudyGroupName();
@@ -166,7 +166,7 @@ public class CollectionManager extends DataManager {
         }
     }
 
-    private CommandResult addStudyGroup(StudyGroup studyGroup, Request<?> request) throws SQLException {
+    private synchronized CommandResult addStudyGroup(StudyGroup studyGroup, Request<?> request) throws SQLException {
         boolean ok = databaseManager.addStudyGroup(studyGroup, request.user.getUsername());
         if (ok) {
             studyGroupCollection.add(studyGroup);
@@ -176,13 +176,13 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult clear(Request<?> request) {
+    public synchronized CommandResult clear(Request<?> request) {
         studyGroupCollection.clear();
         return new CommandResult(ResultStatus.OK, "Элементы успешно удалены из коллекции");
     }
 
     @Override
-    public CommandResult countByGroupAdmin(Request<?> request) {
+    public synchronized CommandResult countByGroupAdmin(Request<?> request) {
         try {
             Person admin = (Person) request.entity;
             int num = (int) studyGroupCollection.stream()
@@ -195,7 +195,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult info(Request<?> request) {
+    public synchronized CommandResult info(Request<?> request) {
         ZonedDateTime lastInitTime = getLastInitTime();
         String lastInitTimeString = (lastInitTime == null) ? "в данной сессии инициализации еще не происходило" :
                 lastInitTime.toString();
@@ -213,7 +213,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult filterGreaterThanExpelledStudents(Request<?> request) {
+    public synchronized CommandResult filterGreaterThanExpelledStudents(Request<?> request) {
         try {
             Long expelledStudents = (Long) request.entity;
             String result = studyGroupCollection.stream()
@@ -228,7 +228,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult removeById(Request<?> request) {
+    public synchronized CommandResult removeById(Request<?> request) {
         try {
             Integer id = (Integer) request.entity;
             if (studyGroupCollection.stream().filter(studyGroup -> studyGroup.getId().equals(id)).findFirst().orElse(null) == null)
@@ -253,7 +253,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult removeAllByShouldBeExpelled(Request<?> request) {
+    public synchronized CommandResult removeAllByShouldBeExpelled(Request<?> request) {
         try {
             Integer shouldBeExpelled = (Integer) request.entity;
             return deleteElements(databaseManager.removeAllByShouldBeExpelled(shouldBeExpelled));
@@ -265,7 +265,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult removeGreater(Request<?> request) {
+    public synchronized CommandResult removeGreater(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
             return deleteElements(databaseManager.removeGreater(studyGroup));
@@ -277,7 +277,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult removeLower(Request<?> request) {
+    public synchronized CommandResult removeLower(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
             return deleteElements(databaseManager.removeLower(studyGroup));
@@ -288,7 +288,7 @@ public class CollectionManager extends DataManager {
         }
     }
 
-    private CommandResult deleteElements(List<Integer> deletedIds) {
+    private synchronized CommandResult deleteElements(List<Integer> deletedIds) {
         int last = studyGroupCollection.size();
         if (deletedIds.size() > 0) {
             deletedIds.forEach(id -> studyGroupCollection.removeIf(studyGroup -> studyGroup.getId().equals(id)));
@@ -298,7 +298,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public CommandResult update(Request<?> request) {
+    public synchronized CommandResult update(Request<?> request) {
         try {
             StudyGroup studyGroup = (StudyGroup) request.entity;
             int id = studyGroup.getId();
@@ -333,7 +333,7 @@ public class CollectionManager extends DataManager {
     }
 
     @Override
-    public String toString() {
+    public synchronized String toString() {
         if (studyGroupCollection.isEmpty()) return "Коллекция пуста!";
         return studyGroupCollection.stream()
                 .sorted(sortByName)

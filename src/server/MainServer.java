@@ -2,19 +2,16 @@ package server;
 
 import common.Config;
 import common.DataManager;
-import server.execution.ExecutionService;
+import server.execution.CommandExecutionService;
 import server.handlers.ReadRequestRunnable;
 import server.handlers.RequestHandler;
 import server.handlers.ServerInputHandler;
 import server.util.CollectionManager;
 import server.util.DatabaseManager;
 import server.util.FileManager;
-import sun.nio.ch.SocketAdaptor;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
@@ -24,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainServer {
 
     private static int port = Config.PORT;
-    private static final ExecutorService readRequestThreadPool = Executors.newFixedThreadPool(10);
+    private static final ExecutorService readRequestThreadPool = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
         if (args.length == 1) {
@@ -75,7 +72,7 @@ public class MainServer {
             dataManager.save();
         }));
 
-        ExecutionService executionService = new ExecutionService(dataManager, databaseManager);
+        CommandExecutionService commandExecutionService = new CommandExecutionService(dataManager, databaseManager);
 
         AtomicBoolean exit = new AtomicBoolean(false);
         new ServerInputHandler(dataManager, exit).start();
@@ -84,7 +81,7 @@ public class MainServer {
             try {
                 SocketChannel socketChannel = serverSocketChannel.accept();
                 if (socketChannel == null) continue;
-                RequestHandler requestHandler = new RequestHandler(executionService);
+                RequestHandler requestHandler = new RequestHandler(commandExecutionService);
                 readRequestThreadPool.submit(new ReadRequestRunnable(socketChannel, requestHandler));
             } catch (IOException exception) {
                 exception.printStackTrace();

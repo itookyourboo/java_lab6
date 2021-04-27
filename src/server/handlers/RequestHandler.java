@@ -3,7 +3,7 @@ package server.handlers;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
-import server.execution.ExecutionService;
+import server.execution.CommandExecutionService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -12,10 +12,10 @@ import java.util.concurrent.Future;
 
 public class RequestHandler {
 
-    private ExecutionService executionService;
+    private CommandExecutionService commandExecutionService;
 
-    public RequestHandler(ExecutionService executionService) {
-        this.executionService = executionService;
+    public RequestHandler(CommandExecutionService commandExecutionService) {
+        this.commandExecutionService = commandExecutionService;
     }
 
     public CommandResult handleRequest(Request<?> request, ExecutorService handleRequestThread) {
@@ -42,7 +42,7 @@ public class RequestHandler {
 
         @Override
         public CommandResult call() {
-            CommandResult result = executionService.executeCommand(request);
+            CommandResult result = commandExecutionService.executeCommand(request);
             if (result.status == ResultStatus.OK)
                 System.out.println("Команда выполнена успешно");
             else

@@ -27,6 +27,7 @@ public class ServerInputHandler extends Thread {
                         break;
                     case "exit":
                         exit.set(true);
+                        System.exit(0);
                         return;
                     default:
                         System.out.println("Такой команды нет.");
