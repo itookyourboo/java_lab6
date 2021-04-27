@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="1352.0" y="515.0">common.Config</node>
+    <node x="0.0" y="515.0">common.xml.StudyGroups</node>
+    <node x="2298.0" y="440.0">common.net.CommandResult</node>
+    <node x="873.0" y="515.0">client.util.Interactor</node>
+    <node x="514.0" y="440.0">server.handlers.SendResponseRunnable</node>
+    <node x="2456.0" y="130.0">client.commands.UpdateCommand</node>
+    <node x="2101.0" y="440.0">client.RequestSender</node>
+    <node x="772.0" y="130.0">client.commands.RemoveAllByShouldBeExpelledCommand</node>
+    <node x="1734.0" y="285.0">common.exceptions.ScriptRecursionException</node>
+    <node x="2495.0" y="440.0">common.net.ResultStatus</node>
+    <node x="261.0" y="440.0">common.exceptions.NotInBoundsException</node>
+    <node x="233.0" y="285.0">server.handlers.RequestHandler</node>
+    <node x="1676.0" y="130.0">client.commands.RemoveGreaterCommand</node>
+    <node x="1249.0" y="440.0">server.execution.ExecutionService</node>
+    <node x="1203.0" y="515.0">common.net.Request</node>
+    <node x="1520.0" y="130.0">client.commands.ShowCommand</node>
+    <node x="1260.0" y="130.0">client.commands.CountByGroupAdminCommand</node>
+    <node x="1470.0" y="440.0">server.util.DatabaseManager</node>
+    <node x="1536.0" y="0.0">client.commands.Command</node>
+    <node x="2296.0" y="285.0">common.exceptions.MustBeNotEmptyException</node>
+    <node x="1433.0" y="285.0">common.exceptions.CollectionIsEmptyException</node>
+    <node x="1775.0" y="515.0">common.model.User</node>
+    <node x="1493.0" y="515.0">common.Crypto</node>
+    <node x="0.0" y="210.0">client.commands.RegisterCommand</node>
+    <node x="0.0" y="365.0">server.util.CollectionManager</node>
+    <node x="2573.0" y="285.0">common.xml.ZonedDateTimeXmlAdapter</node>
+    <node x="616.0" y="130.0">client.commands.InfoCommand</node>
+    <node x="783.0" y="285.0">common.exceptions.WrongAmountOfArgumentsException</node>
+    <node x="2988.0" y="130.0">client.commands.HelpCommand</node>
+    <node x="2684.0" y="440.0">server.util.FileManager</node>
+    <node x="229.0" y="365.0">server.handlers.RequestHandler.RequestExecutor</node>
+    <node x="1112.0" y="130.0">client.commands.AddCommand</node>
+    <node x="404.0" y="130.0">client.commands.RemoveLowerCommand</node>
+    <node x="2832.0" y="130.0">client.commands.ExitCommand</node>
+    <node x="1634.0" y="515.0">common.model.Person</node>
+    <node x="1012.0" y="440.0">server.handlers.ServerInputHandler</node>
+    <node x="1046.0" y="515.0">common.model.Location</node>
+    <node x="2628.0" y="130.0">client.commands.RemoveByIdCommand</node>
+    <node x="176.0" y="130.0">client.commands.ExecuteScriptCommand</node>
+    <node x="181.0" y="515.0">server.MainServer</node>
+    <node x="1896.0" y="440.0">client.util.CommandManager</node>
+    <node x="527.0" y="515.0">client.MainClient</node>
+    <node x="2850.0" y="285.0">common.exceptions.NoStudyGroupWithSuchId</node>
+    <node x="24.0" y="285.0">common.DataManager</node>
+    <node x="2019.0" y="285.0">common.exceptions.NoAccessToFileException</node>
+    <node x="2068.0" y="130.0">client.commands.FilterGreaterThanExpelledStudentsCommand</node>
+    <node x="2865.0" y="440.0">common.model.Coordinates</node>
+    <node x="767.0" y="440.0">server.handlers.ReadRequestRunnable</node>
+    <node x="0.0" y="440.0">common.exceptions.AccessDeniedException</node>
+    <node x="1904.0" y="130.0">client.commands.ClearCommand</node>
+    <node x="442.0" y="285.0">common.exceptions.IncorrectInputInScriptException</node>
+    <node x="12.0" y="130.0">client.commands.LoginCommand</node>
+    <node x="700.0" y="515.0">common.model.StudyGroup</node>
+    <node x="1092.0" y="210.0">client.commands.AddIfMinCommand</node>
+    <node x="1124.0" y="285.0">common.exceptions.StudyGroupNotFoundException</node>
+    <node x="1683.0" y="440.0">common.model.FormOfEducation</node>
+    <node x="354.0" y="515.0">server.execution.Executable</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="client.commands.FilterGreaterThanExpelledStudentsCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="2252.0" y="90.0" />
+      <point x="1608.8" y="90.0" />
+      <point x="20.799999999999955" y="15.0" />
+    </edge>
+    <edge source="server.handlers.RequestHandler.RequestExecutor" target="server.handlers.RequestHandler">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="client.commands.LoginCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="84.0" y="50.0" />
+      <point x="1539.4666666666667" y="50.0" />
+      <point x="-48.5333333333333" y="15.0" />
+    </edge>
+    <edge source="server.util.CollectionManager" target="common.DataManager">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="client.commands.RemoveByIdCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="2720.0" y="70.0" />
+      <point x="1622.6666666666667" y="70.0" />
+      <point x="34.66666666666674" y="15.0" />
+    </edge>
+    <edge source="client.commands.ClearCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="1976.0" y="100.0" />
+      <point x="1601.8666666666666" y="100.0" />
+      <point x="13.86666666666656" y="15.0" />
+    </edge>
+    <edge source="client.commands.ExitCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="2900.0" y="60.0" />
+      <point x="1629.6" y="60.0" />
+      <point x="41.59999999999991" y="15.0" />
+    </edge>
+    <edge source="client.commands.ExecuteScriptCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="280.0" y="60.0" />
+      <point x="1546.4" y="60.0" />
+      <point x="-41.59999999999991" y="15.0" />
+    </edge>
+    <edge source="client.commands.RemoveGreaterCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="1780.0" y="110.0" />
+      <point x="1594.9333333333334" y="110.0" />
+      <point x="6.933333333333394" y="15.0" />
+    </edge>
+    <edge source="client.commands.RemoveLowerCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="500.0" y="70.0" />
+      <point x="1553.3333333333333" y="70.0" />
+      <point x="-34.66666666666674" y="15.0" />
+    </edge>
+    <edge source="client.commands.InfoCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="684.0" y="80.0" />
+      <point x="1560.2666666666667" y="80.0" />
+      <point x="-27.73333333333335" y="15.0" />
+    </edge>
+    <edge source="client.commands.UpdateCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="2532.0" y="80.0" />
+      <point x="1615.7333333333333" y="80.0" />
+      <point x="27.73333333333335" y="15.0" />
+    </edge>
+    <edge source="client.commands.ShowCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="client.commands.RemoveAllByShouldBeExpelledCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="932.0" y="90.0" />
+      <point x="1567.2" y="90.0" />
+      <point x="-20.799999999999955" y="15.0" />
+    </edge>
+    <edge source="client.commands.AddIfMinCommand" target="client.commands.AddCommand">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="client.commands.RegisterCommand" target="client.commands.LoginCommand">
+      <point x="0.0" y="-15.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="client.commands.AddCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="1176.0" y="100.0" />
+      <point x="1574.1333333333334" y="100.0" />
+      <point x="-13.86666666666656" y="15.0" />
+    </edge>
+    <edge source="client.commands.CountByGroupAdminCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="1380.0" y="110.0" />
+      <point x="1581.0666666666666" y="110.0" />
+      <point x="-6.933333333333394" y="15.0" />
+    </edge>
+    <edge source="client.commands.HelpCommand" target="client.commands.Command">
+      <point x="0.0" y="-15.0" />
+      <point x="3056.0" y="50.0" />
+      <point x="1636.5333333333333" y="50.0" />
+      <point x="48.5333333333333" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="796.0" y="423.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
