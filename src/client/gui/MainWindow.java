@@ -1,15 +1,12 @@
 package client.gui;
 
-import client.impl.OnConnectButtonClickedListener;
 import client.util.LocaleManager;
-import common.Config;
 import common.model.StudyGroup;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class MainWindow extends JFrame {
