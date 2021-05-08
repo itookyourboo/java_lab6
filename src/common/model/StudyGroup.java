@@ -1,11 +1,17 @@
 package common.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import common.xml.ZonedDateTimeXmlAdapter;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -180,21 +186,56 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
 
     @Override
     public String toString() {
-        return "StudyGroup{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", coordinates=" + coordinates.toString() +
-                ", creationDate=" + creationDate.toString() +
-                ", studentsCount=" + studentsCount +
-                ", expelledStudents=" + expelledStudents +
-                ", shouldBeExpelled=" + shouldBeExpelled +
-                ", formOfEducation=" + formOfEducation.toString() +
-                ", groupAdmin=" + groupAdmin.toString() +
-                '}';
+        return new GsonBuilder()
+                .registerTypeAdapter(ZonedDateTime.class, zonedDateTimeTypeAdapter)
+                .enableComplexMapKeySerialization()
+                .create().toJson(this);
     }
+
+    private static final TypeAdapter<ZonedDateTime> zonedDateTimeTypeAdapter = new TypeAdapter<ZonedDateTime>() {
+        @Override
+        public void write(JsonWriter jsonWriter, ZonedDateTime zonedDateTime) throws IOException {
+            jsonWriter.value(zonedDateTime.toString());
+        }
+
+        @Override
+        public ZonedDateTime read(JsonReader jsonReader) throws IOException {
+            return ZonedDateTime.parse(jsonReader.nextString());
+        }
+    };
 
     @Override
     public int compareTo(StudyGroup o) {
         return name.compareTo(o.name);
+    }
+
+    public static StudyGroup fromJson(String json) {
+        return new GsonBuilder()
+                .registerTypeAdapter(ZonedDateTime.class, zonedDateTimeTypeAdapter)
+                .enableComplexMapKeySerialization()
+                .create()
+                .fromJson(json, StudyGroup.class);
+    }
+
+    public static void main(String[] args) {
+        StudyGroup studyGroup = new StudyGroup(
+                1,
+                "sksd",
+                new Coordinates(2, 2),
+                ZonedDateTime.now(),
+                21,
+                12L,
+                12,
+                FormOfEducation.DISTANCE_EDUCATION,
+                new Person(
+                        "aksd",
+                        21,
+                        "laslads",
+                        new Location(1, 2, "dksad")
+                ));
+        String json = studyGroup.toString();
+        System.out.println(json);
+        StudyGroup studyGroup1 = StudyGroup.fromJson(json);
+        System.out.println(studyGroup.equals(studyGroup1));
     }
 }
