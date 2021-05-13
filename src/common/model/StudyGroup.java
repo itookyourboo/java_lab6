@@ -209,6 +209,51 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
         return name.compareTo(o.name);
     }
 
+    public static StudyGroup fromObjects(Object... objects) {
+        return new StudyGroup(
+                (String) objects[0],                    // GroupName
+                new Coordinates(
+                        (int) objects[1],               // X
+                        (long) objects[2]               // Y
+                ),
+                ZonedDateTime.now(),                    // Date
+                (int) objects[3],                       // StudentsCount
+                (long) objects[4],                      // ExpelledStudents
+                (int) objects[5],                       // ShouldBeExpelled
+                (FormOfEducation) objects[6],           // FormOfEducation
+                new Person(
+                        (String) objects[7],            // AdminName
+                        (long) objects[8],              // AdminWeight
+                        (String) objects[9],            // PassportID
+                        new Location(
+                                (int) objects[10],      // X
+                                (int) objects[11],      // Y
+                                (String) objects[12]    // LocationName
+                        )
+                )
+        );
+    }
+
+    public Object[] toObjectArray() {
+        return new Object[] {
+                getId(),
+                getName(),
+                getCoordinates().getX(),
+                getCoordinates().getY(),
+                getCreationDate(),
+                getStudentsCount(),
+                getExpelledStudents(),
+                getShouldBeExpelled(),
+                getFormOfEducation(),
+                getGroupAdmin().getName(),
+                getGroupAdmin().getWeight(),
+                getGroupAdmin().getPassportID(),
+                getGroupAdmin().getLocation().getX(),
+                getGroupAdmin().getLocation().getY(),
+                getGroupAdmin().getLocation().getName()
+        };
+    }
+
     public static StudyGroup fromJson(String json) {
         return new GsonBuilder()
                 .registerTypeAdapter(ZonedDateTime.class, zonedDateTimeTypeAdapter)
