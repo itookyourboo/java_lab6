@@ -6,6 +6,7 @@ import client.RequestSender;
 import common.exceptions.NoAccessToFileException;
 import common.exceptions.ScriptRecursionException;
 import common.exceptions.WrongAmountOfArgumentsException;
+import common.net.CommandResult;
 
 import java.io.*;
 import java.nio.file.NoSuchFileException;
@@ -55,6 +56,13 @@ public class ExecuteScriptCommand extends Command {
         } catch (NoAccessToFileException e) {
             Interactor.println("Нет прав на чтение файла");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        Interactor.setOutputStream((OutputStream) objects[1]);
+        execute((String) objects[0]);
+        return null;
     }
 
     @Override

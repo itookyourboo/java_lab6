@@ -18,6 +18,7 @@ public class FilterGreaterThanExpelledStudentsCommand extends Command {
 
     /**
      * Executes the command.
+     *
      * @return Command execute status.
      */
 
@@ -37,6 +38,13 @@ public class FilterGreaterThanExpelledStudentsCommand extends Command {
         } catch (NumberFormatException exception) {
             Interactor.println("Ожидается число типа Long");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        Long expelledStudents = (Long) objects[0];
+        Request<Long> request = new Request<>(getName(), expelledStudents);
+        return requestSender.sendRequest(request);
     }
 
     @Override

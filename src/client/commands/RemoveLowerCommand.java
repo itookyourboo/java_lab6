@@ -16,6 +16,10 @@ import common.net.ResultStatus;
  * 'remove_greater' command. Removes elements greater than user entered.
  */
 public class RemoveLowerCommand extends Command {
+    public RemoveLowerCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
+
     public RemoveLowerCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
     }
@@ -49,6 +53,13 @@ public class RemoveLowerCommand extends Command {
         } catch (IncorrectInputInScriptException exception) {
             Interactor.printError("Не удалось выполнить скрипт.");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        StudyGroup studyGroup = StudyGroup.fromObjects(objects);
+        Request<StudyGroup> request = new Request<>(getName(), studyGroup);
+        return requestSender.sendRequest(request);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package client.commands;
 
 import client.RequestSender;
+import common.net.CommandResult;
 
 import java.util.Scanner;
 
@@ -20,6 +21,7 @@ public abstract class Command {
     public abstract String getName();
     public abstract String getDescription();
     public abstract void execute(String stringArgument);
+    public abstract CommandResult executeWithObjectArgument(Object... objects);
 
     public boolean canExecuteIfNotAuthed() {
         return false;

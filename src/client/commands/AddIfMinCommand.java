@@ -8,6 +8,10 @@ import java.util.Scanner;
  */
 public class AddIfMinCommand extends AddCommand {
 
+    public AddIfMinCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
+
     public AddIfMinCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
     }

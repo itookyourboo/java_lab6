@@ -4,6 +4,8 @@ package client.commands;
 import client.util.CommandManager;
 import client.util.Interactor;
 import common.exceptions.WrongAmountOfArgumentsException;
+import common.net.CommandResult;
+import common.net.ResultStatus;
 
 /**
  * 'help' command. Just for logical structure. Does nothing.
@@ -28,6 +30,11 @@ public class HelpCommand extends Command {
         } catch (WrongAmountOfArgumentsException exception) {
             Interactor.println("Использование: '" + getName() + "'");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        return new CommandResult(ResultStatus.OK, commandManager.getCommandsNameWithDescription());
     }
 
     @Override

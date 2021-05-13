@@ -6,6 +6,10 @@ import java.util.Scanner;
 
 public class RegisterCommand extends LoginCommand {
 
+    public RegisterCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
+
     public RegisterCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
     }

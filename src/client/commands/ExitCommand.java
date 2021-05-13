@@ -2,6 +2,7 @@ package client.commands;
 
 
 import client.util.Interactor;
+import common.net.CommandResult;
 
 /**
  * 'exit' command. Closes the program.
@@ -15,6 +16,11 @@ public class ExitCommand extends Command {
     @Override
     public void execute(String argument) {
         Interactor.println("Выход.");
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        return null;
     }
 
     @Override

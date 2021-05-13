@@ -17,6 +17,10 @@ import common.net.ResultStatus;
  */
 public class UpdateCommand extends Command {
 
+    public UpdateCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
+
     public UpdateCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
     }
@@ -56,6 +60,14 @@ public class UpdateCommand extends Command {
         } catch (IncorrectInputInScriptException exception) {
             Interactor.printError("Не удалось выполнить скрипт.");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        StudyGroup studyGroup = StudyGroup.fromObjects(objects);
+        studyGroup.setId((Integer) objects[objects.length - 1]);
+        Request<StudyGroup> request = new Request<>(getName(), studyGroup);
+        return requestSender.sendRequest(request);
     }
 
     @Override

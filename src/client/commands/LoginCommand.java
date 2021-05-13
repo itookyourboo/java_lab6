@@ -13,6 +13,10 @@ import java.util.Scanner;
 
 public class LoginCommand extends Command {
 
+    public LoginCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
+
     public LoginCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
     }
@@ -45,6 +49,19 @@ public class LoginCommand extends Command {
         } catch (WrongAmountOfArgumentsException exception) {
             Interactor.println("Использование: '" + getName() + "'");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        String username = (String) objects[0];
+        String password = (String) objects[1];
+        password = Crypto.encryptString(password);
+        User user = new User(username, password);
+        Request<User> request = new Request<>(getName(), user);
+        CommandResult result = requestSender.sendRequest(request);
+        if (result.status == ResultStatus.OK)
+            requestSender.setUser(user);
+        return result;
     }
 
     @Override

@@ -4,7 +4,7 @@ import client.util.Interactor;
 import client.RequestSender;
 import common.exceptions.IncorrectInputInScriptException;
 import common.exceptions.WrongAmountOfArgumentsException;
-import common.model.StudyGroup;
+import common.model.*;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
@@ -16,6 +16,10 @@ import java.util.Scanner;
  * 'add' command. Adds a new element to the collection.
  */
 public class AddCommand extends Command {
+
+    public AddCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
 
     public AddCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
@@ -57,5 +61,12 @@ public class AddCommand extends Command {
         } catch (IncorrectInputInScriptException exception) {
             Interactor.printError("Не удалось выполнить скрипт.");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        StudyGroup studyGroup = StudyGroup.fromObjects(objects);
+        Request<StudyGroup> request = new Request<>(getName(), studyGroup);
+        return requestSender.sendRequest(request);
     }
 }

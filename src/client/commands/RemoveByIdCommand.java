@@ -43,4 +43,11 @@ public class RemoveByIdCommand extends Command {
             Interactor.printError("Ожидается число типа Integer.");
         }
     }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        Integer id = (Integer) objects[0];
+        Request<Integer> request = new Request<>(getName(), id);
+        return requestSender.sendRequest(request);
+    }
 }

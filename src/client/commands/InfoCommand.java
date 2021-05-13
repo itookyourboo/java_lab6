@@ -37,6 +37,12 @@ public class InfoCommand extends Command {
     }
 
     @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        Request<String> request = new Request<>(getName(), null);
+        return requestSender.sendRequest(request);
+    }
+
+    @Override
     public String getName() {
         return "info";
     }

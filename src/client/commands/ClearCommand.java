@@ -32,6 +32,12 @@ public class ClearCommand extends Command {
     }
 
     @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        Request<?> request = new Request<String>(getName(), null);
+        return requestSender.sendRequest(request);
+    }
+
+    @Override
     public String getName() {
         return "clear";
     }

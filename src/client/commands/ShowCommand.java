@@ -3,6 +3,7 @@ package client.commands;
 import client.util.Interactor;
 import client.RequestSender;
 import common.exceptions.WrongAmountOfArgumentsException;
+import common.model.StudyGroup;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
@@ -34,6 +35,12 @@ public class ShowCommand extends Command {
         } catch (WrongAmountOfArgumentsException exception) {
             Interactor.println("Использование: '" + getName() + "'");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        Request<String> request = new Request<>(getName(), null);
+        return requestSender.sendRequest(request);
     }
 
     @Override

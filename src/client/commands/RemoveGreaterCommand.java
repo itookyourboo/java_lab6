@@ -7,7 +7,7 @@ import client.util.Interactor;
 import client.RequestSender;
 import common.exceptions.IncorrectInputInScriptException;
 import common.exceptions.WrongAmountOfArgumentsException;
-import common.model.StudyGroup;
+import common.model.*;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
@@ -16,6 +16,10 @@ import common.net.ResultStatus;
  * 'remove_greater' command. Removes elements greater than user entered.
  */
 public class RemoveGreaterCommand extends Command {
+    public RemoveGreaterCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
+
     public RemoveGreaterCommand(RequestSender requestSender, Scanner scanner) {
         super(requestSender, scanner);
     }
@@ -49,6 +53,13 @@ public class RemoveGreaterCommand extends Command {
         } catch (IncorrectInputInScriptException exception) {
             Interactor.printError("Не удалось выполнить скрипт.");
         }
+    }
+
+    @Override
+    public CommandResult executeWithObjectArgument(Object... objects) {
+        StudyGroup studyGroup = StudyGroup.fromObjects(objects);
+        Request<StudyGroup> request = new Request<>(getName(), studyGroup);
+        return requestSender.sendRequest(request);
     }
 
     @Override

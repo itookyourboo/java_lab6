@@ -9,6 +9,7 @@ import common.model.Location;
 import common.model.Person;
 
 import java.io.Console;
+import java.io.OutputStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -469,5 +470,8 @@ public class Interactor {
     }
     public static void displayInput() {
         System.out.print("> ");
+    }
+
+    public static void setOutputStream(OutputStream object) {
     }
 }
