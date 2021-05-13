@@ -1,5 +1,9 @@
 package client;
 
+import client.commands.Command;
+import client.commands.LoginCommand;
+import client.commands.RegisterCommand;
+import client.commands.ShowCommand;
 import client.gui.LoginWindow;
 import client.gui.MainWindow;
 import client.impl.LoginContract;
@@ -23,7 +27,6 @@ public class MainClient {
     private static int port = Config.PORT;
     private static RequestSender requestSender;
     private static CommandManager commandManager;
-    private static Scanner scanner;
 
     public static void main(String[] args) {
         if (args.length == 1) {
@@ -42,26 +45,19 @@ public class MainClient {
         loginWindow.setLoginContract(new LoginContract() {
             @Override
             public void onLoginClicked(String username, String password) {
-                User user = new User(username, Crypto.encryptString(password));
-                Request<User> request = new Request<>("login", user);
-                CommandResult result = requestSender.sendRequest(request);
-                if (result.status == ResultStatus.OK) {
-                    showMainWindow();
-                    loginWindow.setVisible(false);
-                    requestSender.setUser(user);
-                } else
-                    loginWindow.showError(result.message);
+                loginOrRegister(new LoginCommand(requestSender), username, password);
             }
 
             @Override
             public void onRegisterClicked(String username, String password) {
-                User user = new User(username, Crypto.encryptString(password));
-                Request<User> request = new Request<>("register", user);
-                CommandResult result = requestSender.sendRequest(request);
+                loginOrRegister(new RegisterCommand(requestSender), username, password);
+            }
+
+            private void loginOrRegister(Command command, String username, String password) {
+                CommandResult result = command.executeWithObjectArgument(username, password);
                 if (result.status == ResultStatus.OK) {
                     showMainWindow();
                     loginWindow.setVisible(false);
-                    requestSender.setUser(user);
                 } else
                     loginWindow.showError(result.message);
             }
@@ -71,8 +67,7 @@ public class MainClient {
 
     private static void showMainWindow() {
         List<StudyGroup> list;
-        Request<String> request = new Request<>("show", null);
-        CommandResult result = requestSender.sendRequest(request);
+        CommandResult result = new ShowCommand(requestSender).executeWithObjectArgument();
         if (result.status == ResultStatus.OK) {
             list = Arrays.stream(result.message.split("\n"))
                     .map(StudyGroup::fromJson)
@@ -86,8 +81,16 @@ public class MainClient {
 
     private static void connect(int port) {
         requestSender = new RequestSender(port);
-        scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         commandManager = new CommandManager(requestSender, scanner);
         System.out.println("Клиент запущен! Порт: " + port);
+    }
+
+    public RequestSender getRequestSender() {
+        return requestSender;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 }
