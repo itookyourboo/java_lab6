@@ -167,6 +167,7 @@ public class CollectionManager extends DataManager {
     private synchronized CommandResult addStudyGroup(StudyGroup studyGroup, Request<?> request) throws SQLException {
         boolean ok = databaseManager.addStudyGroup(studyGroup, request.user.getUsername());
         if (ok) {
+            studyGroup.setOwner(request.user.getUsername());
             studyGroupCollection.add(studyGroup);
             return new CommandResult(ResultStatus.OK, "added");
         }
@@ -185,7 +186,7 @@ public class CollectionManager extends DataManager {
             } catch (Exception ignored) {}
         });
 
-        return new CommandResult(ResultStatus.OK, "removed " + i);
+        return new CommandResult(ResultStatus.OK, "_removed " + i);
     }
 
     @Override
@@ -301,7 +302,7 @@ public class CollectionManager extends DataManager {
             deletedIds.forEach(id -> studyGroupCollection.removeIf(studyGroup -> studyGroup.getId().equals(id)));
             return new CommandResult(ResultStatus.OK, "_removedNum: " + (last - studyGroupCollection.size()));
         }
-        return new CommandResult(ResultStatus.OK, "notRemovedDueToNoAccess");
+        return new CommandResult(ResultStatus.OK, "noAccess");
     }
 
     @Override
@@ -319,7 +320,7 @@ public class CollectionManager extends DataManager {
 
             return new CommandResult(ResultStatus.ERROR, "notUpdated");
         } catch (AccessDeniedException exception) {
-            return new CommandResult(ResultStatus.ERROR, "notUpdatedDueToNoAccess");
+            return new CommandResult(ResultStatus.ERROR, "noAccess");
         } catch (NoStudyGroupWithSuchId exception) {
             return new CommandResult(ResultStatus.ERROR, "noSuchId");
         } catch (SQLException exception) {

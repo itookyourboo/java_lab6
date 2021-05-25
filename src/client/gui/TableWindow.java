@@ -1,5 +1,6 @@
 package client.gui;
 
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -11,6 +12,7 @@ import javax.swing.table.TableRowSorter;
 import client.Client;
 import client.UIController;
 import client.commands.*;
+import client.impl.Updatable;
 import client.impl.Validatable;
 import client.util.ConsoleOutputStream;
 import client.util.LocaleManager;
@@ -20,18 +22,18 @@ import common.net.CommandResult;
 import common.net.ResultStatus;
 import net.miginfocom.swing.*;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.*;
+import java.util.List;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 /**
  * @author unknown
  */
-public class TableWindow extends JPanel implements CustomWindow {
+public class TableWindow extends JPanel implements CustomWindow, Updatable {
 
     private Client client;
     private volatile List<StudyGroup> list;
@@ -43,6 +45,7 @@ public class TableWindow extends JPanel implements CustomWindow {
         localize(LocaleManager.getLanguage());
     }
 
+    @Override
     public synchronized boolean checkForUpdate() {
         CommandResult result = new ShowCommand(client.getRequestSender())
                 .executeWithObjectArgument();
@@ -59,7 +62,6 @@ public class TableWindow extends JPanel implements CustomWindow {
         }
 
         if (!updated.equals(list)) {
-            loadData();
             System.out.println("LOAD DATA");
             return true;
         }
@@ -67,6 +69,7 @@ public class TableWindow extends JPanel implements CustomWindow {
         return false;
     }
 
+    @Override
     public synchronized void loadData() {
         CommandResult result = new ShowCommand(client.getRequestSender())
                 .executeWithObjectArgument();
@@ -98,7 +101,7 @@ public class TableWindow extends JPanel implements CustomWindow {
     public void localize(LocaleManager.Lang lang) {
         LocaleManager.setLanguage(lang);
 
-        UIController.setTitle(LocaleManager.getString("tableWindow"));
+        UIController.setTitle(LocaleManager.getString("tableWindow") + " [" + client.getRequestSender().getUser().getUsername() + "]");
         updateLocaleBox(lang);
         addButton.setText(LocaleManager.getString("addCommand"));
         logOutButton.setText(LocaleManager.getString("logOut"));
@@ -176,12 +179,9 @@ public class TableWindow extends JPanel implements CustomWindow {
         }
     }
 
-    private void filterButtonMouseReleased(MouseEvent e) {
-        // TODO add your code here
-    }
-
     private void visualizeButtonMouseReleased(MouseEvent e) {
-        // TODO add your code here
+        VisualWindow visualWindow = new VisualWindow(client);
+        UIController.switchWindow(UIController.getFrame(), visualWindow);
     }
 
     private void addButtonMouseReleased(MouseEvent e) {
@@ -199,7 +199,9 @@ public class TableWindow extends JPanel implements CustomWindow {
             CommandResult result = new ClearCommand(client.getRequestSender())
                     .executeWithObjectArgument();
             loadData();
-            showDialog(this, result.message);
+            showDialog(this, result.message
+                    .replace("removed", LocaleManager.getString("removed"))
+                    .replace("notRemoved", LocaleManager.getString("notRemoved")));
         }
     }
 
@@ -253,11 +255,15 @@ public class TableWindow extends JPanel implements CustomWindow {
     }
 
     private void removeByIdButtonMouseReleased(MouseEvent e) {
-        String input = JOptionPane.showInputDialog(this, LocaleManager.getString("removeById"));
+        String input = JOptionPane.showInputDialog(this, LocaleManager.getString("removeByIdCommand"));
         try {
             int id = Integer.parseInt(input);
             CommandResult result = new RemoveByIdCommand(client.getRequestSender()).executeWithObjectArgument(id);
-            showDialog(this, result.message);
+            showDialog(this, result.message
+                .replace("noSuchId", LocaleManager.getString("noSuchId"))
+                .replace("removed", LocaleManager.getString("removed"))
+                .replace("notRemoved", LocaleManager.getString("notRemoved")
+                .replace("noAccess", LocaleManager.getString("noAccess"))));
             loadData();
         } catch (NumberFormatException numberFormatException) {
             showDialog(this, LocaleManager.getString("numberFormatException"));
@@ -288,7 +294,8 @@ public class TableWindow extends JPanel implements CustomWindow {
                 loadData();
                 showDialog(TableWindow.this, result.message);
             } else {
-                showDialog(studyGroupWindow, result.message);
+                showDialog(studyGroupWindow, result.message
+                    .replace("noAccess", LocaleManager.getString("noAccess")));
             }
         });
     }
@@ -301,6 +308,9 @@ public class TableWindow extends JPanel implements CustomWindow {
                 UIController.switchWindow(UIController.getFrame(), TableWindow.this);
                 return;
             }
+
+            if (command instanceof AddCommand)
+                studyGroup.setOwner(client.getRequestSender().getUser().getUsername());
 
             CommandResult result = command.executeWithObjectArgument(studyGroup.toObjectArguments());
             UIController.switchWindow(UIController.getFrame(), TableWindow.this);

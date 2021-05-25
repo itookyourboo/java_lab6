@@ -32,11 +32,11 @@ public class Interactor {
     public static String askUsername(Scanner scanner) {
         String username;
         while (true) {
-            System.out.println("Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ:");
+            System.out.println("Введите имя пользователя:");
             username = scanner.nextLine();
             if (patternUsername.matcher(username).matches())
                 return username;
-            printError("РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ - РѕС‚ 3 РґРѕ 12 СЃРёРјРІРѕР»РѕРІ (_0-9a-Z).");
+            printError("Имя пользователя - от 3 до 12 символов (_0-9a-Z).");
         }
     }
 
@@ -44,7 +44,7 @@ public class Interactor {
         String password;
         Console console = System.console();
         while (true) {
-            System.out.println("Р’РІРµРґРёС‚Рµ РїР°СЂРѕР»СЊ:");
+            System.out.println("Введите пароль:");
             if (console != null) {
                 char[] symbols = console.readPassword();
                 if (symbols == null) continue;
@@ -52,7 +52,7 @@ public class Interactor {
             } else password = scanner.nextLine();
             if (patternPassword.matcher(password).matches())
                 return password;
-            printError("РџР°СЂРѕР»СЊ - РѕС‚ 6 РґРѕ 30 СЃРёРјРІРѕР»РѕРІ (С…РѕС‚СЏ Р±С‹ 1 С†РёС„СЂР°, 1 Р·Р°РіР»Р°РІРЅР°СЏ Рё 1 СЃС‚СЂРѕС‡РЅР°СЏ Р»Р°С‚РёРЅСЃРєР°СЏ Р±СѓРєРІР°, _0-9a-Z!@#$%^&*).");
+            printError("Пароль - от 6 до 30 символов (хотя бы 1 цифра, 1 заглавная и 1 строчная латинская буква, _0-9a-Z!@#$%^&*).");
         }
     }
 
@@ -78,16 +78,16 @@ public class Interactor {
                 if (name.length() >= maxLength) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("РРјСЏ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅРѕ!");
+                printError("Имя не распознано!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (MustBeNotEmptyException exception) {
-                printError("РРјСЏ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј!");
+                printError("Имя не может быть пустым!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             } catch (NotInBoundsException e) {
-                printError(String.format("Р”Р»РёРЅР° СЃС‚СЂРѕРєРё РЅРµ РІС…РѕРґРёС‚ РІ РґРёР°РїР°Р·РѕРЅ (%d; %d)", minLength, maxLength));
+                printError(String.format("Длина строки не входит в диапазон (%d; %d)", minLength, maxLength));
             }
         }
         return name;
@@ -106,9 +106,9 @@ public class Interactor {
         while (true) {
             try {
                 if (withLimit)
-                    System.out.println("Р’РІРµРґРёС‚Рµ РєРѕРѕСЂРґРёРЅР°С‚Сѓ X > " + MIN_X + ":");
+                    System.out.println("Введите координату X > " + MIN_X + ":");
                 else
-                    System.out.println("Р’РІРµРґРёС‚Рµ РєРѕРѕСЂРґРёРЅР°С‚Сѓ X:");
+                    System.out.println("Введите координату X:");
                 displayInput();
                 strX = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strX);
@@ -116,21 +116,21 @@ public class Interactor {
                 if (withLimit && x <= MIN_X) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("РљРѕРѕСЂРґРёРЅР°С‚Р° X РЅРµ СЂР°СЃРїРѕР·РЅР°РЅР°!");
+                printError("Координата X не распознана!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NotInBoundsException exception) {
-                printError("РљРѕРѕСЂРґРёРЅР°С‚Р° X РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + (withLimit ? MIN_X : Integer.MIN_VALUE)
+                printError("Координата X должна быть в диапазоне (" + (withLimit ? MIN_X : Integer.MIN_VALUE)
                         + ";" + Integer.MAX_VALUE + ")!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NumberFormatException exception) {
                 if (patternNumber.matcher(strX).matches())
-                    printError("РљРѕРѕСЂРґРёРЅР°С‚Р° X РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + (withLimit ? MIN_X : Integer.MIN_VALUE)
+                    printError("Координата X должна быть в диапазоне (" + (withLimit ? MIN_X : Integer.MIN_VALUE)
                             + ";" + Integer.MAX_VALUE + ")!");
                 else
-                    printError("РљРѕРѕСЂРґРёРЅР°С‚Р° X РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅР° С‡РёСЃР»РѕРј!");
+                    printError("Координата X должна быть представлена числом!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             }
         }
@@ -148,24 +148,24 @@ public class Interactor {
         long y;
         while (true) {
             try {
-                System.out.println("Р’РІРµРґРёС‚Рµ РєРѕРѕСЂРґРёРЅР°С‚Сѓ Y:");
+                System.out.println("Введите координату Y:");
                 displayInput();
                 strY = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strY);
                 y = Long.parseLong(strY);
                 break;
             } catch (NoSuchElementException exception) {
-                printError("РљРѕРѕСЂРґРёРЅР°С‚Р° Y РЅРµ СЂР°СЃРїРѕР·РЅР°РЅР°!");
+                printError("Координата Y не распознана!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NumberFormatException exception) {
                 if (patternNumber.matcher(strY).matches())
-                    printError("РљРѕРѕСЂРґРёРЅР°С‚Р° Y РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + Long.MIN_VALUE
+                    printError("Координата Y должна быть в диапазоне (" + Long.MIN_VALUE
                             + ";" + Long.MAX_VALUE + ")!");
                 else
-                    printError("РљРѕРѕСЂРґРёРЅР°С‚Р° Y РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅР° С‡РёСЃР»РѕРј!");
+                    printError("Координата Y должна быть представлена числом!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             }
         }
@@ -195,21 +195,21 @@ public class Interactor {
         FormOfEducation formOfEducation;
         while (true) {
             try {
-                System.out.println("РЎРїРёСЃРѕРє С„РѕСЂРј РѕР±СѓС‡РµРЅРёСЏ - " + FormOfEducation.nameList());
-                System.out.println("Р’РІРµРґРёС‚Рµ С„РѕСЂРјСѓ РѕР±СѓС‡РµРЅРёСЏ:");
+                System.out.println("Список форм обучения - " + FormOfEducation.nameList());
+                System.out.println("Введите форму обучения:");
                 displayInput();
                 strFormOfEducation = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strFormOfEducation);
                 formOfEducation = FormOfEducation.valueOf(strFormOfEducation.toUpperCase());
                 break;
             } catch (NoSuchElementException exception) {
-                printError("Р¤РѕСЂРјР° РѕР±СѓС‡РµРЅРёСЏ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅР°!");
+                printError("Форма обучения не распознана!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (IllegalArgumentException exception) {
-                printError("Р¤РѕСЂРјС‹ РѕР±СѓС‡РµРЅРёСЏ РЅРµС‚ РІ СЃРїРёСЃРєРµ!");
+                printError("Формы обучения нет в списке!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             }
         }
@@ -227,7 +227,7 @@ public class Interactor {
         int studentsCount;
         while (true) {
             try {
-                System.out.println("Р’РІРµРґРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СѓРґРµРЅС‚РѕРІ:");
+                System.out.println("Введите количество студентов:");
                 displayInput();
                 strStudentsCount = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strStudentsCount);
@@ -235,19 +235,19 @@ public class Interactor {
                 if (studentsCount <= MIN_STUDENTS_COUNT) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("Р§РёСЃР»Рѕ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅРѕ!");
+                printError("Число не распознано!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NumberFormatException exception) {
                 if (patternNumber.matcher(strStudentsCount).matches())
-                    printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + MIN_STUDENTS_COUNT + ";" + Integer.MAX_VALUE + ")!");
+                    printError("Число должно быть в диапазоне (" + MIN_STUDENTS_COUNT + ";" + Integer.MAX_VALUE + ")!");
                 else
-                    printError("РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СѓРґРµРЅС‚РѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅРѕ С‡РёСЃР»РѕРј!");
+                    printError("Количество студентов должно быть представлено числом!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             } catch (NotInBoundsException e) {
-                printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ " + MIN_STUDENTS_COUNT);
+                printError("Число должно быть больше " + MIN_STUDENTS_COUNT);
             }
         }
         return studentsCount;
@@ -264,7 +264,7 @@ public class Interactor {
         long expelledStudents;
         while (true) {
             try {
-                System.out.println("Р’РІРµРґРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚С‡РёСЃР»РµРЅРЅС‹С… СЃС‚СѓРґРµРЅС‚РѕРІ:");
+                System.out.println("Введите количество отчисленных студентов:");
                 displayInput();
                 strExpelledStudents = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strExpelledStudents);
@@ -272,19 +272,19 @@ public class Interactor {
                 if (expelledStudents <= MIN_EXPELLED_STUDENTS) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("Р§РёСЃР»Рѕ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅРѕ!");
+                printError("Число не распознано!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NumberFormatException exception) {
                 if (patternNumber.matcher(strExpelledStudents).matches())
-                    printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + MIN_EXPELLED_STUDENTS + ";" + Long.MAX_VALUE + ")!");
+                    printError("Число должно быть в диапазоне (" + MIN_EXPELLED_STUDENTS + ";" + Long.MAX_VALUE + ")!");
                 else
-                    printError("РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СѓРґРµРЅС‚РѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅРѕ С‡РёСЃР»РѕРј!");
+                    printError("Количество студентов должно быть представлено числом!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             } catch (NotInBoundsException e) {
-                printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ " + MIN_EXPELLED_STUDENTS);
+                printError("Число должно быть больше " + MIN_EXPELLED_STUDENTS);
             }
         }
         return expelledStudents;
@@ -315,7 +315,7 @@ public class Interactor {
         int shouldBeExpelled;
         while (true) {
             try {
-                System.out.println("Р’РІРµРґРёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СѓРґРµРЅС‚РѕРІ, РєРѕС‚РѕСЂС‹Рµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕС‚С‡РёСЃР»РµРЅС‹:");
+                System.out.println("Введите количество студентов, которые должны быть отчислены:");
                 displayInput();
                 strShouldBeExpelled = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strShouldBeExpelled);
@@ -323,19 +323,19 @@ public class Interactor {
                 if (shouldBeExpelled <= MIN_SHOULD_BE_EXPELLED) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("Р§РёСЃР»Рѕ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅРѕ!");
+                printError("Число не распознано!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NumberFormatException exception) {
                 if (patternNumber.matcher(strShouldBeExpelled).matches())
-                    printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + MIN_SHOULD_BE_EXPELLED + ";" + Integer.MAX_VALUE + ")!");
+                    printError("Число должно быть в диапазоне (" + MIN_SHOULD_BE_EXPELLED + ";" + Integer.MAX_VALUE + ")!");
                 else
-                    printError("РљРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СѓРґРµРЅС‚РѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅРѕ С‡РёСЃР»РѕРј!");
+                    printError("Количество студентов должно быть представлено числом!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             } catch (NotInBoundsException e) {
-                printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ " + MIN_SHOULD_BE_EXPELLED);
+                printError("Число должно быть больше " + MIN_SHOULD_BE_EXPELLED);
             }
         }
         return shouldBeExpelled;
@@ -348,7 +348,7 @@ public class Interactor {
      * @throws IncorrectInputInScriptException if script is running and something goes wrong.
      */
     public static String askAdminName(Scanner scanner) throws IncorrectInputInScriptException {
-        return askName(scanner, "Р’РІРµРґРёС‚Рµ РёРјСЏ Р°РґРјРёРЅР° РіСЂСѓРїРїС‹:", 0, Integer.MAX_VALUE);
+        return askName(scanner, "Введите имя админа группы:", 0, Integer.MAX_VALUE);
     }
 
     /**
@@ -358,7 +358,7 @@ public class Interactor {
      * @throws IncorrectInputInScriptException if script is running and something goes wrong.
      */
     public static String askLocationName(Scanner scanner) throws IncorrectInputInScriptException {
-        return askName(scanner, "Р’РІРµРґРёС‚Рµ РёРјСЏ Р»РѕРєР°С†РёРё:", 0, MAX_LOCATION_NAME_LENGTH);
+        return askName(scanner, "Введите имя локации:", 0, MAX_LOCATION_NAME_LENGTH);
     }
 
     /**
@@ -368,7 +368,7 @@ public class Interactor {
      * @throws IncorrectInputInScriptException if script is running and something goes wrong.
      */
     public static String askGroupName(Scanner scanner) throws IncorrectInputInScriptException {
-        return askName(scanner, "Р’РІРµРґРёС‚Рµ РёРјСЏ РіСЂСѓРїРїС‹:", 0, Integer.MAX_VALUE);
+        return askName(scanner, "Введите имя группы:", 0, Integer.MAX_VALUE);
     }
 
     /**
@@ -382,7 +382,7 @@ public class Interactor {
         long weight;
         while (true) {
             try {
-                System.out.println("Р’РІРµРґРёС‚Рµ РІРµСЃ СЃС‚СѓРґРµРЅС‚Р°:");
+                System.out.println("Введите вес студента:");
                 displayInput();
                 strWeight = scanner.nextLine().trim();
                 if (fileMode) System.out.println(strWeight);
@@ -390,19 +390,19 @@ public class Interactor {
                 if (weight <= MIN_WEIGHT) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("Р§РёСЃР»Рѕ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅРѕ!");
+                printError("Число не распознано!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NumberFormatException exception) {
                 if (patternNumber.matcher(strWeight).matches())
-                    printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ РґРёР°РїР°Р·РѕРЅРµ (" + MIN_WEIGHT + ";" + Long.MAX_VALUE + ")!");
+                    printError("Число должно быть в диапазоне (" + MIN_WEIGHT + ";" + Long.MAX_VALUE + ")!");
                 else
-                    printError("Р’РµСЃ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅ С‡РёСЃР»РѕРј!");
+                    printError("Вес должен быть представлен числом!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             } catch (NotInBoundsException e) {
-                printError("Р§РёСЃР»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»СЊС€Рµ " + MIN_WEIGHT);
+                printError("Число должно быть больше " + MIN_WEIGHT);
             }
         }
         return weight;
@@ -415,7 +415,7 @@ public class Interactor {
      * @throws IncorrectInputInScriptException if script is running and something goes wrong.
      */
     public static String askPassportID(Scanner scanner) throws IncorrectInputInScriptException {
-        return askName(scanner, "Р’РІРµРґРёС‚Рµ ID РїР°СЃРїРѕСЂС‚Р°:", 4, Integer.MAX_VALUE);
+        return askName(scanner, "Введите ID паспорта:", 4, Integer.MAX_VALUE);
     }
 
     /**
@@ -450,13 +450,13 @@ public class Interactor {
                 if (!answer.equals("+") && !answer.equals("-")) throw new NotInBoundsException();
                 break;
             } catch (NoSuchElementException exception) {
-                printError("РћС‚РІРµС‚ РЅРµ СЂР°СЃРїРѕР·РЅР°РЅ!");
+                printError("Ответ не распознан!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (NotInBoundsException exception) {
-                printError("РћС‚РІРµС‚ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РїСЂРµРґСЃС‚Р°РІР»РµРЅ Р·РЅР°РєР°РјРё '+' РёР»Рё '-'!");
+                printError("Ответ должен быть представлен знаками '+' или '-'!");
                 if (fileMode) throw new IncorrectInputInScriptException();
             } catch (IllegalStateException exception) {
-                printError("РќРµРїСЂРµРґРІРёРґРµРЅРЅР°СЏ РѕС€РёР±РєР°!");
+                printError("Непредвиденная ошибка!");
                 System.exit(0);
             }
         }
@@ -467,7 +467,7 @@ public class Interactor {
         System.out.println(str);
     }
     public static void printError(String error) {
-        System.out.println("РћРЁРР‘РљРђ! " + error);
+        System.out.println("ОШИБКА! " + error);
     }
     public static void displayInput() {
         System.out.print("> ");

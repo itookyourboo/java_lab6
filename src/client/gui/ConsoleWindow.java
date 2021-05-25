@@ -30,6 +30,9 @@ public class ConsoleWindow extends JPanel implements CustomWindow {
 
     @Override
     public void localize(LocaleManager.Lang lang) {
+        LocaleManager.setLanguage(lang);
+
+        UIController.setTitle(LocaleManager.getString("executeScriptCommand") + " [" + client.getRequestSender().getUser().getUsername() + "]");
         backButton.setText(LocaleManager.getString("back"));
     }
 

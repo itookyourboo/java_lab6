@@ -1,6 +1,7 @@
 package client;
 
 import client.gui.TableWindow;
+import client.impl.Updatable;
 import client.util.CommandManager;
 import common.Config;
 
@@ -28,10 +29,10 @@ public class MainClient {
 
         Thread thread = new Thread(() -> {
             while (true) {
-                if (UIController.getPanel() instanceof TableWindow) {
-                    TableWindow tableWindow = (TableWindow) UIController.getPanel();
-                    if (tableWindow.checkForUpdate())
-                        tableWindow.loadData();
+                if (UIController.getPanel() instanceof Updatable) {
+                    Updatable window = (Updatable) UIController.getPanel();
+                    if (window.checkForUpdate())
+                        window.loadData();
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException exception) {

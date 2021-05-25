@@ -59,6 +59,19 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
         this.groupAdmin = groupAdmin;
     }
 
+    public StudyGroup(Integer id, String name, Coordinates coordinates, ZonedDateTime creationDate, Integer studentsCount, Long expelledStudents, Integer shouldBeExpelled, FormOfEducation formOfEducation, Person groupAdmin, String owner) {
+        this.id = id;
+        this.name = name;
+        this.coordinates = coordinates;
+        this.creationDate = creationDate;
+        this.studentsCount = studentsCount;
+        this.expelledStudents = expelledStudents;
+        this.shouldBeExpelled = shouldBeExpelled;
+        this.formOfEducation = formOfEducation;
+        this.groupAdmin = groupAdmin;
+        this.owner = owner;
+    }
+
     public StudyGroup(String name, Coordinates coordinates, ZonedDateTime creationDate, Integer studentsCount, Long expelledStudents, Integer shouldBeExpelled, FormOfEducation formOfEducation, Person groupAdmin) {
         this.name = name;
         this.coordinates = coordinates;
