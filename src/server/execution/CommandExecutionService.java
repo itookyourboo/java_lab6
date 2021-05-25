@@ -47,7 +47,7 @@ public class CommandExecutionService {
 
     public synchronized CommandResult executeCommand(Request<?> request) {
         if (!commands.containsKey(request.command))
-            return new CommandResult(ResultStatus.ERROR, "Такой команды на сервере нет.");
+            return new CommandResult(ResultStatus.ERROR, "noSuchCommand");
         return commands.get(request.command).execute(request);
     }
 }

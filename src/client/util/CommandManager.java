@@ -19,7 +19,7 @@ public class CommandManager {
     public CommandManager(RequestSender requestSender, Scanner scanner){
         registerCommand(new AddCommand(requestSender, scanner));
         registerCommand(new AddIfMinCommand(requestSender, scanner));
-        registerCommand(new ClearCommand());
+        registerCommand(new ClearCommand(requestSender));
         registerCommand(new CountByGroupAdminCommand(requestSender, scanner));
         registerCommand(new ExecuteScriptCommand(this, requestSender));
         registerCommand(new ExitCommand());

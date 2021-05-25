@@ -4,48 +4,155 @@
 
 package client.gui;
 
+import java.awt.event.*;
 import javax.swing.*;
+
+import client.Client;
+import client.UIController;
+import client.impl.OnPersonChangeListener;
+import client.util.LocaleManager;
+import client.util.Validator;
+import client.gui.FieldValidator.ValidationResult;
+import common.exceptions.MustBeNotEmptyException;
+import common.exceptions.NotInBoundsException;
+import common.model.*;
 import net.miginfocom.swing.*;
 
 /**
  * @author unknown
  */
-public class PersonWindow extends JPanel {
-    public PersonWindow() {
+public class PersonWindow extends JPanel implements CustomWindow {
+
+    private Client client;
+    private OnPersonChangeListener onPersonChangeListener;
+
+    public PersonWindow(Client client) {
+        this.client = client;
         initComponents();
+        localize(LocaleManager.getLanguage());
+    }
+
+    public void setOnPersonChangeListener(OnPersonChangeListener onPersonChangeListener) {
+        this.onPersonChangeListener = onPersonChangeListener;
+    }
+
+    @Override
+    public void localize(LocaleManager.Lang lang) {
+        LocaleManager.setLanguage(lang);
+
+        UIController.setTitle(LocaleManager.getString("personWindow"));
+        nameLabel.setText(LocaleManager.getString("name"));
+        weightLabel.setText(LocaleManager.getString("weight"));
+        passportLabel.setText(LocaleManager.getString("passport"));
+        xLabel.setText(LocaleManager.getString("x"));
+        yLabel.setText(LocaleManager.getString("y"));
+        locationLabel.setText(LocaleManager.getString("location"));
+    }
+
+    @Override
+    public void clearFields() {
+        JTextField[] fields = new JTextField[] {nameField, weightField, passportField, xField, yField, locationField};
+        for (JTextField field: fields) field.setText("");
+    }
+
+    private void okButtonMouseReleased(MouseEvent e) {
+        Person newPerson = validatePerson();
+
+        if (newPerson == null) return;
+
+        if (onPersonChangeListener != null)
+            onPersonChangeListener.onChanged(newPerson);
+    }
+
+    private void cancelButtonMouseReleased(MouseEvent e) {
+        if (onPersonChangeListener != null) {
+            onPersonChangeListener.onChanged(null);
+        }
+    }
+
+    private Person validatePerson() {
+        StringBuilder stringBuilder = new StringBuilder();
+        String adminName = "", adminLocationName = "", adminPassport = "";
+        int adminX = 0, adminY = 0;
+        long adminWeight = 0;
+
+        ValidationResult<String> stringResult = FieldValidator.validateAdminName(nameField.getText());
+        if (appendErrors(stringBuilder, stringResult))
+            adminName = stringResult.result;
+
+        ValidationResult<Long> longResult = FieldValidator.validateAdminWeight(weightField.getText());
+        if (appendErrors(stringBuilder, longResult))
+            adminWeight = longResult.result;
+
+        stringResult = FieldValidator.validateAdminPassport(passportField.getText());
+        if (appendErrors(stringBuilder, stringResult))
+            adminPassport = stringResult.result;
+
+        ValidationResult<Integer> intResult = FieldValidator.validateLocationX(xField.getText());
+        if (appendErrors(stringBuilder, intResult))
+            adminX = intResult.result;
+
+        intResult = FieldValidator.validateLocationY(yField.getText());
+        if (appendErrors(stringBuilder, intResult))
+            adminY = intResult.result;
+
+        stringResult = FieldValidator.validateLocationName(locationField.getText());
+        if (appendErrors(stringBuilder, stringResult))
+            adminLocationName = stringResult.result;
+
+        if (!stringBuilder.toString().isEmpty()) {
+            showDialog(this, stringBuilder.toString());
+            return null;
+        }
+
+        return new Person(adminName, adminWeight, adminPassport, new Location(adminX, adminY, adminLocationName));
+    }
+
+    private boolean appendErrors(StringBuilder builder, FieldValidator.ValidationResult<?> result) {
+        if (!result.isCorrect) {
+            builder.append(result.message).append("\n");
+            return false;
+        }
+        return true;
     }
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         // Generated using JFormDesigner Evaluation license - unknown
-        label1 = new JLabel();
-        textField1 = new JTextField();
-        label2 = new JLabel();
-        textField2 = new JTextField();
-        label3 = new JLabel();
-        textField3 = new JTextField();
-        label4 = new JLabel();
-        textField4 = new JTextField();
-        label5 = new JLabel();
-        textField5 = new JTextField();
-        label6 = new JLabel();
-        textField6 = new JTextField();
-        button1 = new JButton();
+        nameLabel = new JLabel();
+        nameField = new JTextField();
+        xLabel = new JLabel();
+        xField = new JTextField();
+        weightLabel = new JLabel();
+        weightField = new JTextField();
+        yLabel = new JLabel();
+        yField = new JTextField();
+        passportLabel = new JLabel();
+        passportField = new JTextField();
+        locationLabel = new JLabel();
+        locationField = new JTextField();
+        vSpacer1 = new JPanel(null);
+        cancelButton = new JButton();
+        okButton = new JButton();
 
         //======== this ========
-        setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.TitledBorder(new javax
-        .swing.border.EmptyBorder(0,0,0,0), "JF\u006frmD\u0065sig\u006eer \u0045val\u0075ati\u006fn",javax.swing
-        .border.TitledBorder.CENTER,javax.swing.border.TitledBorder.BOTTOM,new java.awt.
-        Font("Dia\u006cog",java.awt.Font.BOLD,12),java.awt.Color.red
-        ), getBorder())); addPropertyChangeListener(new java.beans.PropertyChangeListener(){@Override
-        public void propertyChange(java.beans.PropertyChangeEvent e){if("\u0062ord\u0065r".equals(e.getPropertyName(
-        )))throw new RuntimeException();}});
+        setBorder (new javax. swing. border. CompoundBorder( new javax .swing .border .TitledBorder (
+        new javax. swing. border. EmptyBorder( 0, 0, 0, 0) , "JF\u006frm\u0044es\u0069gn\u0065r \u0045va\u006cua\u0074io\u006e"
+        , javax. swing. border. TitledBorder. CENTER, javax. swing. border. TitledBorder. BOTTOM
+        , new java .awt .Font ("D\u0069al\u006fg" ,java .awt .Font .BOLD ,12 )
+        , java. awt. Color. red) , getBorder( )) );  addPropertyChangeListener (
+        new java. beans. PropertyChangeListener( ){ @Override public void propertyChange (java .beans .PropertyChangeEvent e
+        ) {if ("\u0062or\u0064er" .equals (e .getPropertyName () )) throw new RuntimeException( )
+        ; }} );
         setLayout(new MigLayout(
-            "fill,hidemode 3",
+            "hidemode 3,align center center",
             // columns
             "[fill]" +
-            "[grow,fill]",
+            "[fill]para" +
+            "[fill]" +
+            "[fill]",
             // rows
+            "[]" +
             "[]" +
             "[]" +
             "[]" +
@@ -54,65 +161,87 @@ public class PersonWindow extends JPanel {
             "[]" +
             "[]"));
 
-        //---- label1 ----
-        label1.setText("Name:");
-        label1.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label1, "cell 0 0");
+        //---- nameLabel ----
+        nameLabel.setText("Name:");
+        nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(nameLabel, "cell 0 0");
 
-        //---- textField1 ----
-        textField1.setColumns(10);
-        add(textField1, "cell 1 0");
+        //---- nameField ----
+        nameField.setColumns(16);
+        add(nameField, "cell 1 0");
 
-        //---- label2 ----
-        label2.setText("Weight:");
-        label2.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label2, "cell 0 1");
-        add(textField2, "cell 1 1");
+        //---- xLabel ----
+        xLabel.setText("X:");
+        xLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(xLabel, "cell 2 0");
 
-        //---- label3 ----
-        label3.setText("Passport:");
-        label3.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label3, "cell 0 2");
-        add(textField3, "cell 1 2");
+        //---- xField ----
+        xField.setColumns(16);
+        add(xField, "cell 3 0");
 
-        //---- label4 ----
-        label4.setText("X:");
-        label4.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label4, "cell 0 3");
-        add(textField4, "cell 1 3");
+        //---- weightLabel ----
+        weightLabel.setText("Weight:");
+        weightLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(weightLabel, "cell 0 1");
+        add(weightField, "cell 1 1");
 
-        //---- label5 ----
-        label5.setText("Y:");
-        label5.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label5, "cell 0 4");
-        add(textField5, "cell 1 4");
+        //---- yLabel ----
+        yLabel.setText("Y:");
+        yLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(yLabel, "cell 2 1");
+        add(yField, "cell 3 1");
 
-        //---- label6 ----
-        label6.setText("Location:");
-        label6.setHorizontalAlignment(SwingConstants.RIGHT);
-        add(label6, "cell 0 5");
-        add(textField6, "cell 1 5");
+        //---- passportLabel ----
+        passportLabel.setText("Passport:");
+        passportLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(passportLabel, "cell 0 2");
+        add(passportField, "cell 1 2");
 
-        //---- button1 ----
-        button1.setText("OK");
-        add(button1, "cell 0 6 2 1");
+        //---- locationLabel ----
+        locationLabel.setText("Location:");
+        locationLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(locationLabel, "cell 2 2");
+        add(locationField, "cell 3 2");
+        add(vSpacer1, "cell 0 3 1 2");
+
+        //---- cancelButton ----
+        cancelButton.setText("Cancel");
+        cancelButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                cancelButtonMouseReleased(e);
+            }
+        });
+        add(cancelButton, "cell 0 5 2 1");
+
+        //---- okButton ----
+        okButton.setText("OK");
+        okButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                okButtonMouseReleased(e);
+            }
+        });
+        add(okButton, "cell 2 5 2 1");
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
     // Generated using JFormDesigner Evaluation license - unknown
-    private JLabel label1;
-    private JTextField textField1;
-    private JLabel label2;
-    private JTextField textField2;
-    private JLabel label3;
-    private JTextField textField3;
-    private JLabel label4;
-    private JTextField textField4;
-    private JLabel label5;
-    private JTextField textField5;
-    private JLabel label6;
-    private JTextField textField6;
-    private JButton button1;
+    private JLabel nameLabel;
+    private JTextField nameField;
+    private JLabel xLabel;
+    private JTextField xField;
+    private JLabel weightLabel;
+    private JTextField weightField;
+    private JLabel yLabel;
+    private JTextField yField;
+    private JLabel passportLabel;
+    private JTextField passportField;
+    private JLabel locationLabel;
+    private JTextField locationField;
+    private JPanel vSpacer1;
+    private JButton cancelButton;
+    private JButton okButton;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

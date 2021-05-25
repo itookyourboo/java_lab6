@@ -22,7 +22,7 @@ import java.util.Objects;
 @XmlRootElement(name="StudyGroup")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StudyGroup implements Comparable<StudyGroup>, Serializable {
-    private static final long serialVersionUID = 0xDEAD;
+    private static final long serialVersionUID = 0xDEAD2;
 
     private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
@@ -34,6 +34,7 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
     private Integer shouldBeExpelled; //Значение поля должно быть больше 0, Поле может быть null
     private FormOfEducation formOfEducation; //Поле не может быть null
     private Person groupAdmin; //Поле не может быть null
+    private String owner;
 
     /**
      * @param id - study group ID
@@ -144,6 +145,14 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
         return groupAdmin;
     }
 
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
     public void update(StudyGroup studyGroup) {
         this.name = studyGroup.name;
         this.coordinates = studyGroup.coordinates;
@@ -234,6 +243,25 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
         );
     }
 
+    public Object[] toObjectArguments() {
+        return new Object[] {
+                getName(),
+                getCoordinates().getX(),
+                getCoordinates().getY(),
+                getStudentsCount(),
+                getExpelledStudents(),
+                getShouldBeExpelled(),
+                getFormOfEducation(),
+                getGroupAdmin().getName(),
+                getGroupAdmin().getWeight(),
+                getGroupAdmin().getPassportID(),
+                getGroupAdmin().getLocation().getX(),
+                getGroupAdmin().getLocation().getY(),
+                getGroupAdmin().getLocation().getName(),
+                getId()
+        };
+    }
+
     public Object[] toObjectArray() {
         return new Object[] {
                 getId(),
@@ -252,6 +280,32 @@ public class StudyGroup implements Comparable<StudyGroup>, Serializable {
                 getGroupAdmin().getLocation().getY(),
                 getGroupAdmin().getLocation().getName()
         };
+    }
+
+    public static StudyGroup fromObjectArray(Object[] objects) {
+        return new StudyGroup(
+                (Integer) objects[0],
+                (String) objects[1],
+                new Coordinates(
+                        (Integer) objects[2],
+                        (Long) objects[3]
+                ),
+                (ZonedDateTime) objects[4],
+                (Integer) objects[5],
+                (Long) objects[6],
+                (Integer) objects[7],
+                (FormOfEducation) objects[8],
+                new Person(
+                        (String) objects[9],
+                        (Long) objects[10],
+                        (String) objects[11],
+                        new Location(
+                                (Integer) objects[12],
+                                (Integer) objects[13],
+                                (String) objects[14]
+                        )
+                )
+        );
     }
 
     public static StudyGroup fromJson(String json) {

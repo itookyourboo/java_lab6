@@ -1,15 +1,22 @@
 package client.commands;
 
+import client.RequestSender;
 import client.util.Interactor;
 import common.exceptions.WrongAmountOfArgumentsException;
 import common.net.CommandResult;
 import common.net.Request;
 import common.net.ResultStatus;
 
+import java.util.Scanner;
+
 /**
  *  'clear' command. Clears the collection.
  */
 public class ClearCommand extends Command {
+
+    public ClearCommand(RequestSender requestSender) {
+        super(requestSender);
+    }
 
     /**
      * Executes the command.

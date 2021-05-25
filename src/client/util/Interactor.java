@@ -10,6 +10,7 @@ import common.model.Person;
 
 import java.io.Console;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -472,6 +473,14 @@ public class Interactor {
         System.out.print("> ");
     }
 
-    public static void setOutputStream(OutputStream object) {
+    public static void setOutputStream(OutputStream outputStream) {
+        PrintStream printStream = new PrintStream(outputStream);
+        System.setOut(printStream);
+        System.setErr(printStream);
+    }
+
+    public static void setDefaultOutputStream() {
+        System.setOut(System.out);
+        System.setErr(System.err);
     }
 }

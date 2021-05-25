@@ -5,127 +5,173 @@ new FormModel {
 	root: new FormRoot {
 		add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class net.miginfocom.swing.MigLayout ) {
 			"$layoutConstraints": "fill,hidemode 3,align center top"
-			"$columnConstraints": "[151,fill][700,grow,fill][fill]"
-			"$rowConstraints": "[][][][][][][][][][][][][]"
+			"$columnConstraints": "[151,fill][700,grow,fill][fill][fill]"
+			"$rowConstraints": "[][][][][][][][][][][][][][]"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "addButton"
 				"text": "Add"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "addButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 0"
 			} )
 			add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 				name: "scrollPane1"
+				"preferredSize": sfield com.jformdesigner.model.FormObject NULL_VALUE
 				add( new FormComponent( "javax.swing.JTable" ) {
 					name: "table"
 					"autoCreateRowSorter": true
+					"fillsViewportHeight": true
 				} )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 1 0 1 12"
+				"value": "cell 1 0 1 13,aligny top,growy"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "logOutButton"
 				"text": "Log out"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "logOutButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 2 0"
+				"value": "cell 2 0 2 1"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "addIfMinButton"
 				"text": "Add if min"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "addIfMinButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 1"
 			} )
-			add( new FormComponent( "javax.swing.JButton" ) {
-				name: "changeLocaleButton"
-				"text": "Change locale"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "localeLabel"
+				"text": "Locale"
+				"horizontalTextPosition": 4
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 2 1"
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "localeBox"
+				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "localeBoxItemStateChanged", true ) )
+			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
+				"value": "cell 3 1"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "clearButton"
 				"text": "Clear"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "clearButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 2"
-			} )
-			add( new FormComponent( "javax.swing.JLabel" ) {
-				name: "filterLabel"
-				"text": "Filter"
-			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 2 2,alignx center,growx 0"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "countButton"
 				"text": "Count by group admin"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "countButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 3"
 			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "columnBox"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "columnLabel"
+				"text": "Column"
+				"horizontalTextPosition": 4
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 2 3"
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "columnBox"
+				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "columnBoxItemStateChanged", true ) )
+			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
+				"value": "cell 3 3"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "executeScriptButton"
 				"text": "Execute script"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "executeScriptButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 4"
 			} )
-			add( new FormComponent( "javax.swing.JComboBox" ) {
-				name: "equalBox"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "criterionLabel"
+				"text": "Criterion"
+				"horizontalTextPosition": 4
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 2 4"
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "criterionBox"
+				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "criterionBoxItemStateChanged", true ) )
+			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
+				"value": "cell 3 4"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "helpButton"
 				"text": "Help"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "helpButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 5"
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "valueLabel"
+				"text": "Value"
+				"horizontalTextPosition": 4
+			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
+				"value": "cell 2 5"
 			} )
 			add( new FormComponent( "javax.swing.JTextField" ) {
 				name: "filterField"
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 2 5"
+				"value": "cell 3 5"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "infoButton"
 				"text": "Info"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "infoButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 6"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "removeByIdButton"
 				"text": "Remove by ID"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "removeByIdButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 7"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "removeGreaterButton"
 				"text": "Remove greater"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "removeGreaterButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 8"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "removeLowerButton"
 				"text": "Remove lower"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "removeLowerButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 9"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "updateButton"
 				"text": "Update"
+				
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "updateButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
 				"value": "cell 0 10"
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "visualizeButton"
 				"text": "Visualization"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseReleased", "visualizeButtonMouseReleased", true ) )
 			}, new FormLayoutConstraints( class net.miginfocom.layout.CC ) {
-				"value": "cell 0 11"
+				"value": "cell 1 13"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 1050, 500 )
+			"size": new java.awt.Dimension( 1120, 470 )
 		} )
 	}
 }

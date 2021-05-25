@@ -56,10 +56,6 @@ public class DatabaseManager {
             STUDY_GROUP_ID);
     private static final String SQL_GET_MIN_STUDY_GROUP_NAME = String.format("SELECT %s FROM %s ORDER BY %s LIMIT 1",
             NAME, TABLE_STUDY_GROUP, NAME);
-//    private static final String SQL_COUNT_BY_GROUP_ADMIN = String.format("SELECT COUNT(*) as count FROM %s WHERE %s = ?",
-//            TABLE_STUDY_GROUP, ADMIN_NAME);
-//    private static final String SQL_FILTER_GREATER_THAN_EXPELLED_STUDENTS = String.format("SELECT * FROM %s WHERE %s > ?",
-//            TABLE_STUDY_GROUP, EXPELLED_STUDENTS);
     private static final String SQL_REMOVE_BY_ID = String.format("DELETE FROM %s WHERE %s = ?",
             TABLE_STUDY_GROUP, STUDY_GROUP_ID);
     private static final String SQL_GET_GREATER = String.format("SELECT %s, %s FROM %s WHERE %s > ?",
@@ -110,13 +106,13 @@ public class DatabaseManager {
             User user = (User) request.entity;
             if (validateUser(user))
                 return new CommandResult(ResultStatus.OK,
-                        String.format("Добро пожаловать, %s!", user.getUsername()));
-            return new CommandResult(ResultStatus.ERROR, "Неверный логин или пароль.");
+                        String.format("_welcome, %s!", user.getUsername()));
+            return new CommandResult(ResultStatus.ERROR, "incorrectLoginOrPassword");
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
+            return new CommandResult(ResultStatus.ERROR, "sqlError");
         } catch (Exception exception) {
-            return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
+            return new CommandResult(ResultStatus.ERROR, "invalidArgument");
         }
     }
 
@@ -126,14 +122,14 @@ public class DatabaseManager {
             if (!userExists(user.getUsername())) {
                 registerUser(user);
                 return new CommandResult(ResultStatus.OK,
-                        String.format("Добро пожаловать, %s!", user.getUsername()));
+                        String.format("_welcome, %s!", user.getUsername()));
             }
-            return new CommandResult(ResultStatus.ERROR, "Пользователь с таким именем уже зарегистрирован.");
+            return new CommandResult(ResultStatus.ERROR, "alreadyRegistered");
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return new CommandResult(ResultStatus.ERROR, "SQL-ошибка на сервере");
+            return new CommandResult(ResultStatus.ERROR, "sqlError");
         } catch (Exception exception) {
-            return new CommandResult(ResultStatus.ERROR, "Передан аргумент другого типа");
+            return new CommandResult(ResultStatus.ERROR, "invalidArgument");
         }
     }
 
@@ -328,7 +324,7 @@ public class DatabaseManager {
     }
 
     private StudyGroup getStudyGroupFromResult(ResultSet resultSet) throws SQLException {
-        return new StudyGroup(
+        StudyGroup studyGroup = new StudyGroup(
                 resultSet.getInt(STUDY_GROUP_ID),
                 resultSet.getString(NAME),
                 new Coordinates(
@@ -352,6 +348,9 @@ public class DatabaseManager {
                         )
                 )
         );
+        studyGroup.setOwner(resultSet.getString(OWNER_USERNAME));
+
+        return studyGroup;
     }
 
     public TreeSet<StudyGroup> readCollection() {

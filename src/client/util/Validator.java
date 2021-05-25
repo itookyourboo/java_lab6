@@ -74,8 +74,8 @@ public class Validator {
 
     private static String validateName(String name, int minLength, int maxLength) throws MustBeNotEmptyException, NotInBoundsException {
         if (name.trim().equals("")) throw new MustBeNotEmptyException();
-        if (name.length() < minLength) throw new NotInBoundsException();
-        if (name.length() > maxLength) throw new NotInBoundsException();
+        if (name.length() < minLength) throw new NotInBoundsException(String.format("(%d; %d)", minLength, maxLength));
+        if (name.length() > maxLength) throw new NotInBoundsException(String.format("(%d; %d)", minLength, maxLength));
         return name;
     }
 
@@ -84,12 +84,12 @@ public class Validator {
         int result;
         try {
             result = Integer.parseInt(number);
-            if (result < min) throw new NotInBoundsException();
-            if (result > max) throw new NotInBoundsException();
+            if (result < min) throw new NotInBoundsException(String.format("(%d; %d)", min, max));
+            if (result > max) throw new NotInBoundsException(String.format("(%d; %d)", min, max));
             return result;
         } catch (NumberFormatException e) {
             if (patternNumber.matcher(number).matches())
-                throw new NotInBoundsException();
+                throw new NotInBoundsException(String.format("(%d; %d)", min, max));
             throw e;
         }
     }
@@ -99,12 +99,12 @@ public class Validator {
         long result;
         try {
             result = Long.parseLong(number);
-            if (result < min) throw new NotInBoundsException();
-            if (result > max) throw new NotInBoundsException();
+            if (result < min) throw new NotInBoundsException(String.format("(%d; %d)", min, max));
+            if (result > max) throw new NotInBoundsException(String.format("(%d; %d)", min, max));
             return result;
         } catch (NumberFormatException e) {
             if (patternNumber.matcher(number).matches())
-                throw new NotInBoundsException();
+                throw new NotInBoundsException(String.format("(%d; %d)", min, max));
             throw new NumberFormatException();
         }
     }

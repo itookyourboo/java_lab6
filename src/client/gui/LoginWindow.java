@@ -1,87 +1,193 @@
 /*
- * Created by JFormDesigner on Sat May 08 14:39:58 MSK 2021
+ * Created by JFormDesigner on Mon May 24 11:29:23 MSK 2021
  */
 
 package client.gui;
 
-import client.impl.LoginContract;
-import client.util.LocaleManager;
-
+import java.awt.event.*;
 import javax.swing.*;
-import java.awt.*;
 
-public class LoginWindow extends JFrame {
+import client.Client;
+import client.UIController;
+import client.commands.Command;
+import client.commands.LoginCommand;
+import client.commands.RegisterCommand;
+import client.util.LocaleManager;
+import client.util.Validator;
+import common.net.CommandResult;
+import common.net.ResultStatus;
+import net.miginfocom.swing.*;
 
-    private LoginContract loginContract;
+/**
+ * @author unknown
+ */
+public class LoginWindow extends JPanel implements CustomWindow {
+    private Client client;
 
-    public LoginWindow() {
-        super(LocaleManager.getString("loginTitle"));
-        initWindow();
+    public LoginWindow(Client client) {
+        this.client = client;
         initComponents();
+        localize(LocaleManager.getLanguage());
     }
 
-    private void initWindow() {
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize().getSize();
-        int width = dimension.width, height = dimension.height;
-        int WINDOW_WIDTH = width / 5, WINDOW_HEIGHT = height / 5;
-        setBounds(width / 2 - WINDOW_WIDTH / 2, height / 2 - WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
-        setResizable(false);
+    private void loginButtonMouseReleased(MouseEvent e) {
+        loginOrRegister(new LoginCommand(client.getRequestSender()));
     }
 
-    public void setLoginContract(LoginContract loginContract) {
-        this.loginContract = loginContract;
+    private void regButtonMouseReleased(MouseEvent e) {
+        loginOrRegister(new RegisterCommand(client.getRequestSender()));
+    }
+
+    private void loginOrRegister(Command command) {
+        String username = loginField.getText();
+        String password = String.valueOf(passwordField.getPassword());
+
+        if (!Validator.validateUsername(username)) {
+            showDialog(this, LocaleManager.getString("invalidUsername"));
+            return;
+        }
+
+        if (!Validator.validatePassword(password)) {
+            showDialog(this, LocaleManager.getString("invalidPassword"));
+            return;
+        }
+
+        CommandResult result = command.executeWithObjectArgument(username, password);
+
+        if (result.status == ResultStatus.OK) {
+            UIController.switchWindow(UIController.getFrame(), new TableWindow(client));
+            clearFields();
+        } else
+            showDialog(this, LocaleManager.getString(result.message));
+    }
+
+    private void localeBoxItemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            String item = (String) e.getItem();
+            LocaleManager.Lang lang = LocaleManager.langMap.get(item);
+            localize(lang);
+        }
+    }
+
+    @Override
+    public void localize(LocaleManager.Lang lang) {
+        LocaleManager.setLanguage(lang);
+
+        updateLocaleBox(lang);
+        loginLabel.setText(LocaleManager.getString("login"));
+        passwordLabel.setText(LocaleManager.getString("password"));
+        loginButton.setText(LocaleManager.getString("enter"));
+        regButton.setText(LocaleManager.getString("register"));
+        localeLabel.setText(LocaleManager.getString("locale"));
+        UIController.setTitle(LocaleManager.getString("loginWindow"));
+    }
+
+    private void updateLocaleBox(LocaleManager.Lang lang) {
+        int i = 0;
+        for (LocaleManager.Lang l: LocaleManager.Lang.values()) {
+            if (l.getName().equals(lang.getName())) {
+                localeBox.setSelectedIndex(i);
+                break;
+            }
+            i++;
+        }
+    }
+
+    @Override
+    public void clearFields() {
+        JTextField[] fields = new JTextField[] {loginField, passwordField};
+        for (JTextField field: fields) field.setText("");
     }
 
     private void initComponents() {
-        setLayout(new GridBagLayout());
+        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+        // Generated using JFormDesigner Evaluation license - unknown
+        loginLabel = new JLabel();
+        loginField = new JTextField();
+        passwordLabel = new JLabel();
+        passwordField = new JPasswordField();
+        loginButton = new JButton();
+        regButton = new JButton();
+        localeLabel = new JLabel();
+        localeBox = new JComboBox();
 
-        JLabel loginLabel = new JLabel(LocaleManager.getString("login"));
-        JLabel passwordLabel = new JLabel(LocaleManager.getString("password"));
+        //======== this ========
+        setBorder (new javax. swing. border. CompoundBorder( new javax .swing .border .TitledBorder (new javax. swing. border
+        . EmptyBorder( 0, 0, 0, 0) , "JF\u006frmDesi\u0067ner Ev\u0061luatio\u006e", javax. swing. border. TitledBorder. CENTER, javax
+        . swing. border. TitledBorder. BOTTOM, new java .awt .Font ("Dialo\u0067" ,java .awt .Font .BOLD ,
+        12 ), java. awt. Color. red) , getBorder( )) );  addPropertyChangeListener (new java. beans
+        . PropertyChangeListener( ){ @Override public void propertyChange (java .beans .PropertyChangeEvent e) {if ("borde\u0072" .equals (e .
+        getPropertyName () )) throw new RuntimeException( ); }} );
+        setLayout(new MigLayout(
+            "hidemode 3,align center center",
+            // columns
+            "[fill]" +
+            "[fill]",
+            // rows
+            "[]" +
+            "[]" +
+            "[]" +
+            "[]" +
+            "[]" +
+            "[]"));
 
-        JTextField loginTextField = new JTextField(16);
-        JPasswordField passwordTextField = new JPasswordField(16);
+        //---- loginLabel ----
+        loginLabel.setText("Login");
+        loginLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(loginLabel, "cell 0 0");
 
-        JButton loginButton = new JButton(LocaleManager.getString("enter"));
-        loginButton.addActionListener(l ->
-                loginContract.onLoginClicked(loginTextField.getText(),
-                        String.valueOf(passwordTextField.getPassword())));
+        //---- loginField ----
+        loginField.setColumns(16);
+        add(loginField, "cell 1 0");
 
-        JButton registerButton = new JButton(LocaleManager.getString("register"));
-        registerButton.addActionListener(l ->
-                loginContract.onRegisterClicked(loginTextField.getText(),
-                        String.valueOf(passwordTextField.getPassword())));
+        //---- passwordLabel ----
+        passwordLabel.setText("Password");
+        passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(passwordLabel, "cell 0 1");
+        add(passwordField, "cell 1 1");
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = c.gridy = 0;
-        c.gridwidth = c.gridheight = 1;
-        c.insets = new Insets(5, 5, 5, 5);
-        c.anchor = GridBagConstraints.LINE_END;
-        add(loginLabel, c);
+        //---- loginButton ----
+        loginButton.setText("Log in");
+        loginButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                loginButtonMouseReleased(e);
+            }
+        });
+        add(loginButton, "cell 0 2 2 1");
 
-        c.gridx = 1;
-        add(loginTextField, c);
+        //---- regButton ----
+        regButton.setText("Registration");
+        regButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                regButtonMouseReleased(e);
+            }
+        });
+        add(regButton, "cell 0 3 2 1");
 
-        c.gridy = 1;
-        add(passwordTextField, c);
+        //---- localeLabel ----
+        localeLabel.setText("Locale");
+        localeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(localeLabel, "cell 0 5");
 
-        c.gridx = 0;
-        add(passwordLabel, c);
+        //---- localeBox ----
+        localeBox.addItemListener(e -> localeBoxItemStateChanged(e));
+        add(localeBox, "cell 1 5");
+        // JFormDesigner - End of component initialization  //GEN-END:initComponents
 
-        c.gridy = 2;
-        c.gridwidth = 2;
-        c.weightx = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        add(loginButton, c);
-
-        c.gridy = 3;
-        add(registerButton, c);
-
-        pack();
+        localeBox.setModel(new DefaultComboBoxModel(LocaleManager.langMap.keySet().toArray(new String[0])));
     }
 
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message);
-    }
+    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+    // Generated using JFormDesigner Evaluation license - unknown
+    private JLabel loginLabel;
+    private JTextField loginField;
+    private JLabel passwordLabel;
+    private JPasswordField passwordField;
+    private JButton loginButton;
+    private JButton regButton;
+    private JLabel localeLabel;
+    private JComboBox localeBox;
+    // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

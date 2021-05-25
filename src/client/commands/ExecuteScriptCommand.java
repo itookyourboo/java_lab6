@@ -62,6 +62,7 @@ public class ExecuteScriptCommand extends Command {
     public CommandResult executeWithObjectArgument(Object... objects) {
         Interactor.setOutputStream((OutputStream) objects[1]);
         execute((String) objects[0]);
+        Interactor.setDefaultOutputStream();
         return null;
     }
 
